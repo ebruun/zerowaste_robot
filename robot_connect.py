@@ -1,5 +1,4 @@
 from communication.communication import ABBCommunication
-#from robot.robot import Robot
 
 from planes import f1,a1
 
@@ -58,8 +57,8 @@ def move_to_frame():
 
 while robot.running:
     try:
-        move_to_frame()
-        #move_to_preset("ECL_parking_mid")
+        #move_to_frame()
+        move_to_preset("ECL_parking_mid")
     except:
         robot.close()
 
