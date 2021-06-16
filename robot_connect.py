@@ -1,6 +1,7 @@
 from communication.communication import ABBCommunication
 
-from planes import f1,a1
+from planes import f1,a1, points, x_vectors, y_vectors
+from planes import make_frames
 
 import time
 
@@ -36,19 +37,26 @@ def move_to_preset(joints_abb):
     else:
         pass
 
+frames = make_frames(points, x_vectors, y_vectors)
 
 def move_to_frame():
     if robot.state == 1:
-        rob_num = int(input("\nSet rob: "))
+        #rob_num = int(input("\nSet rob: "))
+        rob_num = 1
+        frame_num = int(input("\nSet frame: "))
 
-        pose_cart = robot.get_current_pose_cartesian()
-        print(pose_cart)
+
+        #pose_cart = robot.get_current_pose_cartesian()
+        pose_cart_base = robot.get_current_pose_cartesian_base()
+        print(pose_cart_base)
 
         robot.float_arbitrary = int(rob_num)
         robot.set_wobj_to_num(int(2))      
-        robot.set_speed_to_num(1)  
+        robot.set_speed_to_num(2)  
 
         print(robot.int_speed)
+
+        f1 = frames[frame_num]
 
         robot.send_pose_cartesian(input = f1, ext_axes_in= a1)
     else:
@@ -57,8 +65,8 @@ def move_to_frame():
 
 while robot.running:
     try:
-        #move_to_frame()
-        move_to_preset("ECL_parking_mid")
+        move_to_frame()
+        #move_to_preset("ECL_parking_mid")
     except:
         robot.close()
 
