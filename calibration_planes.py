@@ -1,7 +1,10 @@
 from compas.geometry import Frame
-
 from compas.geometry import Point
 from compas.geometry import Vector
+from compas.geometry import Transformation
+
+import cv2 as cv
+import numpy as np
 
 f1 = Frame(
     Point(1231.0929857258,2419.28094095468,1301.099233685),
@@ -80,7 +83,7 @@ x_vectors = [
 [0.672747,0,-0.739873],
 [-0.003962,0.999988,-0.002905],
 [-0.003962,0.999988,-0.002905],
-    ]
+]
 
 y_vectors = [
 [-0.584273,0,-0.811557],
@@ -115,7 +118,6 @@ y_vectors = [
 [-0.348376,-0.882208,-0.316769],
 [0.591273,0,-0.806471],
 [0.591273,0,-0.806471],
-
 ]
 
 
@@ -131,4 +133,21 @@ def make_frames(p,x,y):
     return frames
 
 
+def make_yaml(i, pose = False):
+    filename = "dataset/pos{:02d}.yaml".format(i)
+    s = cv.FileStorage(filename, cv.FileStorage_WRITE)
 
+    pose_cart_1 = (pose[0], pose[1], pose[2], pose[3], pose[4], pose[5], pose[6], pose[7], pose[8], pose[9])
+    F_base = Frame.from_quaternion(pose_cart_1[3:7])
+    F_base.point = pose_cart_1[0:3]
+    T = Transformation.from_frame(F_base)
+
+    PoseState = np.array(T)
+
+    s.write('PoseState', PoseState)
+
+    pass
+
+
+if __name__ == "__main__":
+    make_yaml(1)

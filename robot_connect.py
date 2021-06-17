@@ -1,7 +1,11 @@
 from communication.communication import ABBCommunication
 
-from planes import f1,a1, points, x_vectors, y_vectors
-from planes import make_frames
+# LOCAL IMPORTS
+from src.camera.use import capture_image
+from src.utility.io import file_name
+
+from calibration_planes import f1,a1, points, x_vectors, y_vectors
+from calibration_planes import make_frames, make_yaml
 
 import time
 
@@ -30,8 +34,11 @@ def move_to_preset(joints_abb):
         joint_presets = {
             "ECL_parking_high" : [angle_1, -21, 46, 0.0, 66, -90, track_x, 0, 0],
             "ECL_parking_mid"  : [angle_1, -46, 44, 0.0, 90, -90, track_x, 0, 0],
-            "ECL_parking_low"  : [angle_1, -66, 63, 0.0, 90, -90, track_x, 0, 0]
+            "ECL_parking_low"  : [angle_1, -66, 63, 0.0, 90, -90, track_x, 0, 0],
+            "ECL_camera_attach"  : [angle_1, -10, 55, 91, 90, 133, track_x, 0, 0],
         }
+
+
 
         robot.send_axes_absolute(joint_presets[joints_abb], int_arr = None)
     else:
@@ -45,20 +52,24 @@ def move_to_frame():
         rob_num = 1
         frame_num = int(input("\nSet frame: "))
 
-
-        #pose_cart = robot.get_current_pose_cartesian()
-        pose_cart_base = robot.get_current_pose_cartesian_base()
-        print(pose_cart_base)
-
         robot.float_arbitrary = int(rob_num)
         robot.set_wobj_to_num(int(2))      
         robot.set_speed_to_num(2)  
 
-        print(robot.int_speed)
-
         f1 = frames[frame_num]
+        robot.send_pose_cartesian(input = f1, ext_axes_in = a1)
 
-        robot.send_pose_cartesian(input = f1, ext_axes_in= a1)
+        take_image = int(input("\nTake Image: "))
+
+        if take_image:
+            pose_cart_base = robot.get_current_pose_cartesian_base()
+            make_yaml(frame_num+1,pose_cart_base)
+
+            name = "img{:02d}.zdf".format(frame_num+1)
+            capture_image(
+                folder = "dataset",
+                output_file = name,
+                )
     else:
         pass
 
@@ -67,6 +78,7 @@ while robot.running:
     try:
         move_to_frame()
         #move_to_preset("ECL_parking_mid")
+        #move_to_preset("ECL_camera_attach")
     except:
         robot.close()
 
