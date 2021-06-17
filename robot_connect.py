@@ -46,39 +46,38 @@ def move_to_preset(joints_abb):
 
 frames = make_frames(points, x_vectors, y_vectors)
 
-def move_to_frame():
+def move_to_frame(i):
     if robot.state == 1:
-        #rob_num = int(input("\nSet rob: "))
-        rob_num = 1
-        frame_num = int(input("\nSet frame: "))
+        input("Press Enter to move to pos...")
+        print("moving to pos:", i)
 
-        robot.float_arbitrary = int(rob_num)
+        robot.float_arbitrary = int(1)
         robot.set_wobj_to_num(int(2))      
         robot.set_speed_to_num(2)  
 
-        f1 = frames[frame_num]
+        f1 = frames[i]
         robot.send_pose_cartesian(input = f1, ext_axes_in = a1)
 
-        take_image = int(input("\nTake Image: "))
+        input("Press Enter to take photo...\n")
+        pose_cart_base = robot.get_current_pose_cartesian_base()
+        make_yaml(i+1,pose_cart_base)
 
-        if take_image:
-            pose_cart_base = robot.get_current_pose_cartesian_base()
-            make_yaml(frame_num+1,pose_cart_base)
+        name = "img{:02d}.zdf".format(i+1)
+        capture_image(
+            folder = "dataset",
+            output_file = name,
+            )
 
-            name = "img{:02d}.zdf".format(frame_num+1)
-            capture_image(
-                folder = "dataset",
-                output_file = name,
-                )
+        return i + 1
     else:
         pass
 
-
+i = 0
 while robot.running:
     try:
-        move_to_frame()
+        #i = move_to_frame(i)
         #move_to_preset("ECL_parking_mid")
-        #move_to_preset("ECL_camera_attach")
+        move_to_preset("ECL_camera_attach")
     except:
         robot.close()
 
