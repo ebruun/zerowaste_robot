@@ -66,6 +66,7 @@ def move_to_frame(i):
         capture_image(
             folder = "dataset",
             output_file = name,
+            setting_file= "detection_settings.yml",
             )
 
         return i + 1
@@ -75,9 +76,10 @@ def move_to_frame(i):
 i = 0
 while robot.running:
     try:
-        #i = move_to_frame(i)
+        i = move_to_frame(i)
+
         #move_to_preset("ECL_parking_mid")
-        move_to_preset("ECL_camera_attach")
+        #move_to_preset("ECL_camera_attach")
     except:
         robot.close()
 
