@@ -1,6 +1,6 @@
 import numpy as np
 import cv2 as cv
-
+import time
 
 from compas.geometry import Frame
 from compas.geometry import Point
@@ -15,13 +15,7 @@ from src.camera.convert import convert2png, load_pointcloud
 from src.utility.io import file_name
 
 from calibration_planes import f1,a1, points, x_vectors, y_vectors
-from calibration_planes import make_frames, make_yaml_calibration, read_yaml 
-
-
-
-import time
-
-
+from calibration_planes import make_frames, make_yaml_calibration, read_yaml_frames, read_yaml_transformation
 
 
 def move_to_preset(joints_abb):
@@ -52,7 +46,7 @@ def move_to_preset(joints_abb):
     else:
         pass
 
-frames = make_frames(points, x_vectors, y_vectors)
+
 
 def move_to_frame(i):
     if robot.state == 1:
@@ -63,31 +57,28 @@ def move_to_frame(i):
         robot.set_wobj_to_num(int(2))      
         robot.set_speed_to_num(2)  
 
-        pose_cart_base = robot.get_current_pose_cartesian_base()
-        make_yaml(99,pose_cart_base)
-
         f1 = frames[i]
         robot.send_pose_cartesian(input = f1, ext_axes_in = a1)
 
         input("Press Enter to take photo...\n")
-        pose_cart_base = robot.get_current_pose_cartesian_base()
-        make_yaml_calibration(i+1,pose_cart_base)
+        pose_cart = robot.get_current_pose_cartesian() #IN WORLD CARTESIAN
+        make_yaml_calibration(i+1,"calibration_data",pose_cart)
 
         name = "img{:02d}".format(i+1)
         capture_image(
-            folder = "dataset",
+            folder = "calibration_data",
             output_file = file_name(name, ".zdf"),
             setting_file= "detection_settings.yml",
             )
 
         pc = load_pointcloud(
-            folder = "dataset",
+            folder = "calibration_data",
             input_file = file_name(name, ".zdf")
         )
 
         img_png = convert2png(
             pointcloud = pc,
-            folder = "dataset_img",
+            folder = "calibration_img",
             output_file = file_name(name, "_rgb.png"),
             )
 
@@ -98,48 +89,53 @@ def move_to_frame(i):
 
 def pickup():
 
-    # robot.float_arbitrary = int(1)
-    # robot.set_wobj_to_num(int(2))      
-    # robot.set_speed_to_num(2)  
+    robot.float_arbitrary = int(1)
+    robot.set_wobj_to_num(int(2))      
+    robot.set_speed_to_num(2)  
 
-    H2_tcp_cam = read_yaml("transformations","H2_tcp_cam.yaml")
-    H3_base_tcp = read_yaml("transformations","H3_base_tcp.yaml")
-
-
-    #object to camera
-    t1 = np.array([
-        [-1.8410609057830513e-04, -9.2566724562835423e-01, 3.7833862672976393e-01, -5.8480737304687500e+02],
-        [-9.9999826711914852e-01, 8.7130398488241838e-04, 1.6451711357807401e-03, -1.5608366699218750e+03],
-        [-1.8525289869500139e-03, -3.7833766822797615e-01, -9.2566580196967985e-01, 1.6019981689453125e+03],
-        [0., 0., 0., 1. ],
-    ])
-
+    H1_cam_obj = read_yaml_frames("transformations","H1_cam_obj.yaml") #what the camera sees
+    H2_tcp_cam = read_yaml_transformation("transformations","H2_tcp_cam.yaml") #camera calibration
+    H3_base_tcp = read_yaml_transformation("transformations","H3_base_tcp.yaml") #IN CARTESIAN (NOT CARTESIAN_BASE)
+    H4_wobj_base = read_yaml_transformation("transformations","H4_world_base.yaml") #T_cart_to_wobj
 
     #Make into COMPAS objects
+    F = []
+    for h in H1_cam_obj:
+        h = Transformation.from_matrix(h.tolist())
+        f = Frame.from_transformation(h)
+        F.append(f)
+
     H2 = Transformation.from_matrix(H2_tcp_cam.tolist())
     H3 = Transformation.from_matrix(H3_base_tcp.tolist())
+    H4 = Transformation.from_matrix(H4_wobj_base.tolist())
 
-    print(H2)
+    H = Transformation.concatenated(H3,H2)
+    H = Transformation.concatenated(H4,H)
 
-    #robot.send_pose_cartesian(input = ff, ext_axes_in = a1)
+    F_cart = F[0].transformed(H)
+    print(F_cart)
+
+    ff = Frame(Point(2109.992, 3867.577, 954.724), Vector(0.999, -0.041, -0.034), Vector(-0.040, -0.999, 0.033))
+    robot.send_pose_cartesian(input = ff, ext_axes_in = a1)
 
 
+ip_abb = '192.168.125.1'
+robot = ABBCommunication("ABB", ip_abb, port_snd=30003, port_rcv=30004)
+robot.start()
 
-# ip_abb = '192.168.125.1'
-# robot = ABBCommunication("ABB", ip_abb, port_snd=30003, port_rcv=30004)
-# robot.start()
+frames = make_frames(points, x_vectors, y_vectors)
 
-pickup()
+#pickup()
 
-i = 1
-# while robot.running:
-#     try:
-#         #i = move_to_frame(i)
+i = 0
+while robot.running:
+    try:
+        i = move_to_frame(i)
 
-#         pickup()
+        #pickup()
 
-#         #move_to_preset("ECL_parking_mid")
-#         #move_to_preset("ECL_camera_attach")
-#     except:
-#         robot.close()
+        #move_to_preset("ECL_parking_mid")
+        #move_to_preset("ECL_camera_attach")
+    except:
+        robot.close()
 

@@ -1,3 +1,6 @@
 {
-    "python.pythonPath": "C:\\Users\\Edvard\\.conda\\envs\\zerowaste\\python.exe"
+    "python.pythonPath": "C:\\Users\\Edvard\\.conda\\envs\\zerowaste\\python.exe",
+    "python.terminal.activateEnvironment": true,
+    "terminal.integrated.tabs.enabled": true,
+    "terminal.integrated.copyOnSelection": true,
 }
