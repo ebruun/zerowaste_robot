@@ -6,6 +6,11 @@ from compas.geometry import Transformation
 import cv2 as cv
 import numpy as np
 
+from pathlib import Path
+
+
+from src.utility.io import create_file_path
+
 f1 = Frame(
     Point(1231.0929857258,2419.28094095468,1301.099233685),
     Vector(0.0790099124356339,0.996507820346806,0.0270110667055376),
@@ -104,7 +109,7 @@ def make_frames(p,x,y):
     return frames
 
 
-def make_yaml(i, pose = False):
+def make_yaml_calibration(i, pose = False):
     filename = "dataset/pos{:02d}.yaml".format(i)
     s = cv.FileStorage(filename, cv.FileStorage_WRITE)
 
@@ -119,6 +124,25 @@ def make_yaml(i, pose = False):
 
     pass
 
+def make_yaml_frame(folder, name, f):
+    file_name = create_file_path(folder,name)
+    s = cv.FileStorage(file_name, cv.FileStorage_WRITE)
+
+    T = Transformation.from_frame(f)
+    PoseState = np.array(T)
+    s.write('PoseState', PoseState)
+
+def read_yaml(folder, name):
+
+    file_name = create_file_path(folder,name)
+    file_storage = cv.FileStorage(file_name, cv.FILE_STORAGE_READ)
+
+    h = file_storage.getNode("PoseState").mat()
+
+    file_storage.release()
+
+    return h
+
 
 if __name__ == "__main__":
-    make_yaml(1)
+    make_yaml_calibration(1)
