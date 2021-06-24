@@ -6,6 +6,8 @@ from compas.geometry import Frame
 from compas.geometry import Point
 from compas.geometry import Vector
 from compas.geometry import Transformation
+from compas.geometry import Translation
+from compas.geometry import translate_points
 
 from communication.communication import ABBCommunication
 
@@ -88,19 +90,19 @@ def move_to_frame(i):
 
 
 def pickup():
-    input("Press Enter to move to pos...")
+    input("start the process...")
     robot.float_arbitrary = int(1)
     robot.set_wobj_to_num(int(2))      
     robot.set_speed_to_num(2)  
 
-    pose_cart = robot.get_current_pose_cartesian() #IN WORLD CARTESIAN
-    make_yaml_calibration(99,"transformations",pose_cart)
-    input("Press Enter to take photo...\n")
-
+    # pose_cart = robot.get_current_pose_cartesian() #IN WORLD CARTESIAN
+    # make_yaml_calibration(98,"transformations",pose_cart)
+    
+    input("read in the transformation matrices...\n")
     H1_cam_obj = read_yaml_frames("transformations","H1_cam_obj.yaml") #what the camera sees
     H2_tcp_cam = read_yaml_transformation("transformations","H2_tcp_cam.yaml") #camera calibration
     #H3_base_tcp = read_yaml_transformation("transformations","H3_base_tcp.yaml") #IN CARTESIAN (NOT CARTESIAN_BASE)
-    H3_base_tcp = read_yaml_transformation("transformations","pos99.yaml")
+    H3_base_tcp = read_yaml_transformation("transformations","pos98.yaml")
     H4_wobj_base = read_yaml_transformation("transformations","H4_world_base.yaml") #T_cart_to_wobj
 
     #Make into COMPAS objects
@@ -120,8 +122,23 @@ def pickup():
     F_cart = F[0].transformed(H)
     print(F_cart)
 
-    ff = Frame(Point(1642.187, 1233.030, 1423.680), Vector(0.063, -0.997, 0.054), Vector(0.006, 0.054, 0.998))
-    robot.send_pose_cartesian(input = ff, ext_axes_in = a1)
+    s1 = -600
+    s2 = -300
+
+    z_axis = F_cart.zaxis
+    
+    t1 = Translation.from_vector(z_axis*s1)
+    t2 = Translation.from_vector(z_axis*s2)
+
+    F1 = F_cart.transformed(t1)
+    F2 = F_cart.transformed(t2)
+
+
+    #ff = Frame(Point(1642.187, 1233.030, 1423.680), Vector(0.063, -0.997, 0.054), Vector(0.006, 0.054, 0.998))
+    robot.send_pose_cartesian(input = F1, ext_axes_in = a1)
+
+    input("do next move...\n")
+    robot.send_pose_cartesian(input = F2, ext_axes_in = a1)
 
 
 ip_abb = '192.168.125.1'
