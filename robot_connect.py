@@ -88,14 +88,19 @@ def move_to_frame(i):
 
 
 def pickup():
-
+    input("Press Enter to move to pos...")
     robot.float_arbitrary = int(1)
     robot.set_wobj_to_num(int(2))      
     robot.set_speed_to_num(2)  
 
+    pose_cart = robot.get_current_pose_cartesian() #IN WORLD CARTESIAN
+    make_yaml_calibration(99,"transformations",pose_cart)
+    input("Press Enter to take photo...\n")
+
     H1_cam_obj = read_yaml_frames("transformations","H1_cam_obj.yaml") #what the camera sees
     H2_tcp_cam = read_yaml_transformation("transformations","H2_tcp_cam.yaml") #camera calibration
-    H3_base_tcp = read_yaml_transformation("transformations","H3_base_tcp.yaml") #IN CARTESIAN (NOT CARTESIAN_BASE)
+    #H3_base_tcp = read_yaml_transformation("transformations","H3_base_tcp.yaml") #IN CARTESIAN (NOT CARTESIAN_BASE)
+    H3_base_tcp = read_yaml_transformation("transformations","pos99.yaml")
     H4_wobj_base = read_yaml_transformation("transformations","H4_world_base.yaml") #T_cart_to_wobj
 
     #Make into COMPAS objects
@@ -115,7 +120,7 @@ def pickup():
     F_cart = F[0].transformed(H)
     print(F_cart)
 
-    ff = Frame(Point(2109.992, 3867.577, 954.724), Vector(0.999, -0.041, -0.034), Vector(-0.040, -0.999, 0.033))
+    ff = Frame(Point(1642.187, 1233.030, 1423.680), Vector(0.063, -0.997, 0.054), Vector(0.006, 0.054, 0.998))
     robot.send_pose_cartesian(input = ff, ext_axes_in = a1)
 
 
@@ -125,17 +130,17 @@ robot.start()
 
 frames = make_frames(points, x_vectors, y_vectors)
 
-#pickup()
+pickup()
 
-i = 0
-while robot.running:
-    try:
-        i = move_to_frame(i)
+# i = 0
+# while robot.running:
+#     try:
+#        # i = move_to_frame(i)
 
-        #pickup()
+#         pickup()
 
-        #move_to_preset("ECL_parking_mid")
-        #move_to_preset("ECL_camera_attach")
-    except:
-        robot.close()
+#         #move_to_preset("ECL_parking_mid")
+#         #move_to_preset("ECL_camera_attach")
+#     except:
+#         robot.close()
 
