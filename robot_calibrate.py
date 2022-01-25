@@ -125,12 +125,12 @@ def generate_image_data(i):
         )
 
 
-def calibration(rob_num, num_poses):
+def calibration(rob_num, pose_range):
     print("START CALIBRATION")
 
     robot, abb = _robot_connect(rob_num)
 
-    for i in range(num_poses):
+    for i in pose_range:
         print('\n--calibration pose #{}\n'.format(i+1))
 
         # --move to pre-saved config --#
@@ -158,6 +158,6 @@ def calibration(rob_num, num_poses):
 if __name__ == "__main__":
     # calibration variables
     rob_num = 2
-    num_calibration_poses = 10
+    pose_range = range(11, 31)
 
-    calibration(rob_num, num_calibration_poses)
+    calibration(rob_num, pose_range)
