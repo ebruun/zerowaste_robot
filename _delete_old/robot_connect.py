@@ -9,8 +9,8 @@ from src.camera.use import capture_image
 from src.camera.convert import convert2png, load_pointcloud
 from src.utility.io import file_name
 
-from calibration_planes import a1, points, x_vectors, y_vectors
-from calibration_planes import make_frames, make_yaml_calibration, read_yaml_frames, read_yaml_transformation
+from _delete_old.calibration_planes import a1, points, x_vectors, y_vectors
+from _delete_old.calibration_planes import make_frames, make_yaml_calibration, read_yaml_frames, read_yaml_transformation
 
 
 def move_to_preset(joints_abb):
