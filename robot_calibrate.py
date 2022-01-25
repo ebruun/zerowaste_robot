@@ -133,6 +133,7 @@ def calibration(rob_num, num_poses):
     for i in range(num_poses):
         print('\n--calibration pose #{}\n'.format(i+1))
 
+        # --move to pre-saved config --#
         path = _build_config_path(rob_num, i+1)
         config = _read_saved_config(path)
         move_to_config(rob_num, abb, config)
@@ -140,9 +141,11 @@ def calibration(rob_num, num_poses):
         abb.send(rrc.PrintText("MOVE COMPLETE, press play to take image"))
         abb.send_and_wait(rrc.Stop(feedback_level=rrc.FeedbackLevel.DONE))
 
+        # --get frame at config --#
         f = abb.send_and_wait(rrc.GetFrame(), timeout=3)
         print("--frame: ", f)
 
+        # --save frame and image data to be used for calibration --#
         generate_frame_data(i+1, f)
         generate_image_data(i+1)
 
@@ -155,6 +158,6 @@ def calibration(rob_num, num_poses):
 if __name__ == "__main__":
     # calibration variables
     rob_num = 2
-    num_calibration_poses = 2
+    num_calibration_poses = 10
 
     calibration(rob_num, num_calibration_poses)
