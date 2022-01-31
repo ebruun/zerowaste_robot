@@ -3,7 +3,11 @@ import compas_rrc as rrc
 
 # LOCAL IMPORTS
 from src.RRC_CONNECT import connect_to_robot
-from src.io import save_frame_as_matrix_yaml, save_image_zdf_png, load_config_json
+from src.io import (
+    save_frame_as_matrix_yaml,
+    save_image_zdf_png,
+    load_config_json,
+)
 
 
 def _move_to_config(rob_num, abb, configs):

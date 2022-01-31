@@ -16,7 +16,8 @@ def move_by_frame(abb, speed):
 
     # Move robot the new pos
     return abb.send_and_wait(
-        rrc.MoveToFrame(frame, speed, rrc.Zone.FINE, rrc.Motion.LINEAR), timeout=10
+        rrc.MoveToFrame(frame, speed, rrc.Zone.FINE, rrc.Motion.LINEAR),
+        timeout=10,
     )
 
 
@@ -32,7 +33,8 @@ def move_by_robtarget(abb, speed):
 
     # Move robot the new pos
     return abb.send_and_wait(
-        rrc.MoveToRobtarget(frame, external_axes, speed, rrc.Zone.FINE), timeout=10
+        rrc.MoveToRobtarget(frame, external_axes, speed, rrc.Zone.FINE),
+        timeout=10,
     )
 
 
@@ -54,7 +56,8 @@ def move_by_joints(abb, speed, name):
 
     # Move robot to specified position
     return abb.send_and_wait(
-        rrc.MoveToJoints(robot_joints, external_axes, speed, rrc.Zone.FINE), timeout=10
+        rrc.MoveToJoints(robot_joints, external_axes, speed, rrc.Zone.FINE),
+        timeout=10,
     )
 
 

@@ -22,9 +22,6 @@ def _offset_frame(f, offset):
     return f.transformed(t)
 
 
-a = "super long string super long string super long string super long string super long string super long string super long string super long string super long string super long string super long string"
-
-
 # Pickup a member seen by camera (not fully integrated yet)
 # The H1 transformation currently needs to be copied over from the camera analysis
 def pickup(abb):
@@ -38,15 +35,9 @@ def pickup(abb):
     abb.send(rrc.PrintText("PRESS PLAY to read in transformation matrices..."))
     abb.send_and_wait(rrc.Stop(feedback_level=rrc.FeedbackLevel.DONE))
 
-    F_objects = load_as_frames_yaml(
-        "transformations", "H1_cam_obj.yaml"
-    )  # what the camera sees (copy over)
-    T2 = load_as_transformation_yaml(
-        "transformations", "H2_tcp_cam.yaml"
-    )  # camera calibration
-    T3 = load_as_transformation_yaml(
-        "transformations", "H3_base_tcp.yaml"
-    )  # tcp frame in wobj coordinate
+    F_objects = load_as_frames_yaml("transformations", "H1_cam_obj.yaml")
+    T2 = load_as_transformation_yaml("transformations", "H2_tcp_cam.yaml")
+    T3 = load_as_transformation_yaml("transformations", "H3_base_tcp.yaml")
 
     T = Transformation.concatenated(T3, T2)
 
@@ -60,15 +51,17 @@ def pickup(abb):
     speed = 100
 
     abb.send(rrc.PrintText("PRESS PLAY to move to member offset location"))
-    abb.send_and_wait(rrc.Stop(feedback_level=rrc.FeedbackLevel.DONE))
+    abb.send_and_wait(rrc.Stop(feedback_level=rrc.FeedbackLevel.DONE), timeout=20)
     abb.send_and_wait(
-        rrc.MoveToFrame(F_far, speed, rrc.Zone.FINE, rrc.Motion.LINEAR), timeout=20
+        rrc.MoveToFrame(F_far, speed, rrc.Zone.FINE, rrc.Motion.LINEAR),
+        timeout=20,
     )
 
     abb.send(rrc.PrintText("PRESS PLAY to move to member pickup location"))
-    abb.send_and_wait(rrc.Stop(feedback_level=rrc.FeedbackLevel.DONE))
+    abb.send_and_wait(rrc.Stop(feedback_level=rrc.FeedbackLevel.DONE), timeout=20)
     abb.send_and_wait(
-        rrc.MoveToFrame(F_touch, speed, rrc.Zone.FINE, rrc.Motion.LINEAR), timeout=20
+        rrc.MoveToFrame(F_touch, speed, rrc.Zone.FINE, rrc.Motion.LINEAR),
+        timeout=20,
     )
 
 
