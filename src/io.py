@@ -25,7 +25,7 @@ def _create_file_path(folder, filename, rob_num=None, i=None):
         pathlib.Path.cwd(),
         folder.format(rob_num),
         filename.format(i, width=3),
-        )
+    )
 
     print("--created file path: ", path)
     return path
@@ -39,7 +39,7 @@ def save_frame_as_matrix_yaml(folder, name, frame, rob_num=None, i=None):
     t = Transformation.from_frame(frame)
 
     PoseState = np.array(t)
-    s.write('PoseState', PoseState)
+    s.write("PoseState", PoseState)
     s.release()
 
 
@@ -50,18 +50,15 @@ def save_image_zdf_png(i):
         folder="calibration_data",
         output_file=filename + ".zdf",
         setting_file="detection_settings.yml",
-        )
-
-    pc = load_pointcloud(
-        folder="calibration_data",
-        input_file=filename + ".zdf"
     )
+
+    pc = load_pointcloud(folder="calibration_data", input_file=filename + ".zdf")
 
     _ = convert2png(
         pointcloud=pc,
         folder="calibration_img",
         output_file=filename + "_rgb.png",
-        )
+    )
 
 
 def load_config_json(folder, name, rob_num, i):

@@ -5,7 +5,11 @@ from compas.geometry import Translation
 
 # LOCAL IMPORTS
 from src.RRC_CONNECT import connect_to_robot
-from src.io import save_frame_as_matrix_yaml, load_as_frames_yaml, load_as_transformation_yaml
+from src.io import (
+    save_frame_as_matrix_yaml,
+    load_as_frames_yaml,
+    load_as_transformation_yaml,
+)
 
 
 # function to offset a frame in the z-direction
@@ -13,9 +17,12 @@ from src.io import save_frame_as_matrix_yaml, load_as_frames_yaml, load_as_trans
 def _offset_frame(f, offset):
 
     z_axis = f.zaxis
-    t = Translation.from_vector(z_axis*offset)
+    t = Translation.from_vector(z_axis * offset)
 
     return f.transformed(t)
+
+
+a = "super long string super long string super long string super long string super long string super long string super long string super long string super long string super long string super long string"
 
 
 # Pickup a member seen by camera (not fully integrated yet)
@@ -31,9 +38,15 @@ def pickup(abb):
     abb.send(rrc.PrintText("PRESS PLAY to read in transformation matrices..."))
     abb.send_and_wait(rrc.Stop(feedback_level=rrc.FeedbackLevel.DONE))
 
-    F_objects = load_as_frames_yaml("transformations", "H1_cam_obj.yaml")  # what the camera sees (copy over)
-    T2 = load_as_transformation_yaml("transformations", "H2_tcp_cam.yaml")  # camera calibration
-    T3 = load_as_transformation_yaml("transformations", "H3_base_tcp.yaml")  # tcp frame in wobj coordinate
+    F_objects = load_as_frames_yaml(
+        "transformations", "H1_cam_obj.yaml"
+    )  # what the camera sees (copy over)
+    T2 = load_as_transformation_yaml(
+        "transformations", "H2_tcp_cam.yaml"
+    )  # camera calibration
+    T3 = load_as_transformation_yaml(
+        "transformations", "H3_base_tcp.yaml"
+    )  # tcp frame in wobj coordinate
 
     T = Transformation.concatenated(T3, T2)
 
@@ -48,11 +61,15 @@ def pickup(abb):
 
     abb.send(rrc.PrintText("PRESS PLAY to move to member offset location"))
     abb.send_and_wait(rrc.Stop(feedback_level=rrc.FeedbackLevel.DONE))
-    abb.send_and_wait(rrc.MoveToFrame(F_far, speed, rrc.Zone.FINE, rrc.Motion.LINEAR), timeout=20)
+    abb.send_and_wait(
+        rrc.MoveToFrame(F_far, speed, rrc.Zone.FINE, rrc.Motion.LINEAR), timeout=20
+    )
 
     abb.send(rrc.PrintText("PRESS PLAY to move to member pickup location"))
     abb.send_and_wait(rrc.Stop(feedback_level=rrc.FeedbackLevel.DONE))
-    abb.send_and_wait(rrc.MoveToFrame(F_touch, speed, rrc.Zone.FINE, rrc.Motion.LINEAR), timeout=20)
+    abb.send_and_wait(
+        rrc.MoveToFrame(F_touch, speed, rrc.Zone.FINE, rrc.Motion.LINEAR), timeout=20
+    )
 
 
 if __name__ == "__main__":
