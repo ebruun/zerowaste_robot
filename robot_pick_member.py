@@ -22,22 +22,21 @@ def _offset_frame(f, offset):
     return f.transformed(t)
 
 
-# Pickup a member seen by camera (not fully integrated yet)
-# The H1 transformation currently needs to be copied over from the camera analysis
+# Pickup a member seen by camera
 def pickup(abb):
     abb.send(rrc.PrintText("PRESS PLAY to start member pickup process..."))
     abb.send_and_wait(rrc.Stop(feedback_level=rrc.FeedbackLevel.DONE))
 
     f = abb.send_and_wait(rrc.GetFrame(), timeout=3)
     print("--frame: ", f)
-    save_frame_as_matrix_yaml("transformations", "H3_base_tcp.yaml", f)
+    save_frame_as_matrix_yaml("transformations", "H3_wobj_tcp.yaml", f)
 
     abb.send(rrc.PrintText("PRESS PLAY to read in transformation matrices..."))
     abb.send_and_wait(rrc.Stop(feedback_level=rrc.FeedbackLevel.DONE))
 
     F_objects = load_as_frames_yaml("transformations", "H1_cam_obj.yaml")
     T2 = load_as_transformation_yaml("transformations", "H2_tcp_cam.yaml")
-    T3 = load_as_transformation_yaml("transformations", "H3_base_tcp.yaml")
+    T3 = load_as_transformation_yaml("transformations", "H3_wobj_tcp.yaml")
 
     T = Transformation.concatenated(T3, T2)
 

@@ -10,7 +10,11 @@ from compas_fab.robots import Configuration
 from compas_fab.utilities import read_data_from_json
 
 # LOCAL IMPORTS
-from src_cam.camera.use import capture_image
+from src_cam.camera.use import (
+    camera_connect,
+    camera_capture_settings,
+    camera_capture_and_save,
+)
 from src_cam.camera.convert import convert2png, load_pointcloud
 
 
@@ -46,17 +50,20 @@ def save_frame_as_matrix_yaml(folder, name, frame, rob_num=None, i=None):
 def save_image_zdf_png(i):
     filename = "img{:02d}".format(i)
 
-    capture_image(
-        folder="calibration_data",
-        output_file=filename + ".zdf",
-        setting_file="detection_settings.yml",
+    camera = camera_connect()
+    settings = camera_capture_settings(camera)
+    camera_capture_and_save(
+        camera,
+        settings,
+        "calibration_data",
+        filename + ".zdf",
     )
 
     pc = load_pointcloud(folder="calibration_data", input_file=filename + ".zdf")
 
     _ = convert2png(
         pointcloud=pc,
-        folder="calibration_img",
+        folder="calibration_data/_imgs",
         output_file=filename + "_rgb.png",
     )
 
