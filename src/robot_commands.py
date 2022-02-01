@@ -73,15 +73,14 @@ def _configs_to_move(abb, rob_num, configs):
                 config["r2_joint_6"],
             )
 
-        abb.send_and_wait(
-            rrc.MoveToJoints(joints, axis, speed, rrc.Zone.FINE), timeout=30
-        )
+        abb.send_and_wait(rrc.MoveToJoints(joints, axis, speed, rrc.Zone.FINE), timeout=30)
 
 
-def _presets_to_move(abb, rob_num, speed, preset_name):
+def _presets_to_move(abb, rob_num, preset_name):
     """Move robot to preset joint locations"""
 
     abb.send(rrc.PrintText("Moving to preset: {}".format(preset_name)))
+    speed = 100
 
     # --load pre-saved config --#
     configs = load_config_json(
@@ -112,10 +111,8 @@ def _presets_to_move(abb, rob_num, speed, preset_name):
                 config["r2_joint_6"],
             )
 
-            abb.send_and_wait(
-                rrc.MoveToJoints(joints, axis, speed, rrc.Zone.FINE), timeout=30
-            )
-            abb.send(rrc.PrintText("MOVE TO {} DONE".format(preset_name)))
+        abb.send_and_wait(rrc.MoveToJoints(joints, axis, speed, rrc.Zone.FINE), timeout=30)
+        abb.send(rrc.PrintText("MOVE TO {} DONE".format(preset_name)))
 
 
 def _from_move_to_plan(rob_num, robot_pos, config):
@@ -225,12 +222,13 @@ def move_to_frame(abb, f, ext, speed):
 
 if __name__ == "__main__":
     rob_num = 2
-    speed = 100
-    preset_name = "camera_attach"
-    # preset_name = "zero_position"
-    # preset_name = "ECL_park_high"
-    # preset_name = "ECL_park_mid"
-    # preset_name = "ECL_park_low"
+    preset_name = [
+        "camera_attach",
+        "zero_position",
+        "ECL_park_high",
+        "ECL_park_mid",
+        "ECL_park_low",
+    ]
 
     robot, abb = connect_to_robot(rob_num)
-    _presets_to_move(abb, rob_num, speed, preset_name)
+    _presets_to_move(abb, rob_num, preset_name[0])

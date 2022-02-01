@@ -2,6 +2,7 @@
 import cv2 as cv
 import numpy as np
 import pathlib
+import json
 
 # COMPAS IMPORTS
 from compas.geometry import Frame
@@ -18,7 +19,7 @@ from src_cam.camera.use import (
 from src_cam.camera.convert import convert2png, load_pointcloud
 
 
-def _create_file_path(folder, filename, rob_num=None, i=None, **kwargs):
+def _create_file_path(folder, filename, rob_num=None, i=None):
     """create output data path for config files.
 
     Returns:
@@ -35,9 +36,17 @@ def _create_file_path(folder, filename, rob_num=None, i=None, **kwargs):
     return path
 
 
+def save_config_json(folder, name, config, rob_num=None, i=None):
+    filepath = _create_file_path(folder, name, rob_num, i)
+
+    c = config.to_data()
+
+    with open(filepath, "w") as f:
+        json.dump(c, f, indent=4)
+
+
 def save_frame_as_matrix_yaml(folder, name, frame, rob_num=None, i=None):
     filepath = _create_file_path(folder, name, rob_num, i)
-    print(filepath)
     s = cv.FileStorage(filepath.__str__(), cv.FileStorage_WRITE)
 
     t = Transformation.from_frame(frame)
@@ -47,23 +56,25 @@ def save_frame_as_matrix_yaml(folder, name, frame, rob_num=None, i=None):
     s.release()
 
 
-def save_image_zdf_png(i):
+def save_image_zdf_png(i, rob_num):
     filename = "img{:02d}".format(i)
 
-    camera = camera_connect()
+    camera = camera_connect(rob_num)
     settings = camera_capture_settings(camera)
     camera_capture_and_save(
         camera,
         settings,
-        "calibration_data",
+        "calibration_data/R{}".format(rob_num),
         filename + ".zdf",
     )
 
-    pc = load_pointcloud(folder="calibration_data", input_file=filename + ".zdf")
+    pc = load_pointcloud(
+        folder="calibration_data/R{}".format(rob_num), input_file=filename + ".zdf"
+    )
 
     _ = convert2png(
         pointcloud=pc,
-        folder="calibration_data/_imgs",
+        folder="calibration_data/R{}/_imgs".format(rob_num),
         output_file=filename + "_rgb.png",
     )
 
