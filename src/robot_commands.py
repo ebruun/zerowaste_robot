@@ -1,9 +1,16 @@
 # this file is just a random collection of robot control functions, need to clean up later
 
+# PYTHON IMPORTS
+# PYTHON IMPORTS
+import math
+
+# COMPAS IMPORTS
 import compas_rrc as rrc
 from compas_fab.robots import to_radians
 
-import math
+# LOCAL IMPORTS
+from src.RRC_CONNECT import connect_to_robot
+from src.io import load_config_json
 
 
 def move_by_frame(abb, speed):
@@ -38,27 +45,77 @@ def move_by_robtarget(abb, speed):
     )
 
 
-def move_by_joints(abb, speed, name):
-    abb.send(rrc.PrintText("Move by joints"))
+def _configs_to_move(abb, rob_num, configs):
+    """Taking a list of robot configs in (deg & mm) and move the robot to them"""
 
-    joint_presets = {
-        "ECL_parking_high": ([-90, -21, 46, 0.0, 66, -90.0], [3900]),
-        "ECL_parking_mid": ([-90, -46, 44, 0.0, 90, -90.0], [3900]),
-        "ECL_parking_low": ([-90, -66, 63, 0.0, 90, -90.0], [3900]),
-        "zero_position": ([0, 0, 0, 0, 0, 0.0], [0.0]),
-        "camera_attach": ([-90, -10, 55, 91, 90, 133.0], [3900]),
-    }
+    abb.send(rrc.PrintText("Moving to specified configs..."))
+    speed = 100
 
-    robot_joints, external_axes = joint_presets[name]
+    for config in configs:
+        if rob_num == 1:
+            axis = rrc.ExternalAxes(config["r1_cart_joint"])
+            joints = rrc.RobotJoints(
+                config["r1_joint_1"],
+                config["r1_joint_2"],
+                config["r1_joint_3"],
+                config["r1_joint_4"],
+                config["r1_joint_5"],
+                config["r1_joint_6"],
+            )
+        elif rob_num == 2:
+            axis = rrc.ExternalAxes(config["r2_cart_joint"])
+            joints = rrc.RobotJoints(
+                config["r2_joint_1"],
+                config["r2_joint_2"],
+                config["r2_joint_3"],
+                config["r2_joint_4"],
+                config["r2_joint_5"],
+                config["r2_joint_6"],
+            )
 
-    print(robot_joints)
-    print(external_axes)
+        abb.send_and_wait(
+            rrc.MoveToJoints(joints, axis, speed, rrc.Zone.FINE), timeout=30
+        )
 
-    # Move robot to specified position
-    return abb.send_and_wait(
-        rrc.MoveToJoints(robot_joints, external_axes, speed, rrc.Zone.FINE),
-        timeout=10,
+
+def _presets_to_move(abb, rob_num, speed, preset_name):
+    """Move robot to preset joint locations"""
+
+    abb.send(rrc.PrintText("Moving to preset: {}".format(preset_name)))
+
+    # --load pre-saved config --#
+    configs = load_config_json(
+        "configs/presets/R{}",
+        preset_name + ".json",
+        rob_num,
     )
+
+    for config in configs:
+        if rob_num == 1:
+            axis = rrc.ExternalAxes(config["r1_cart_joint"])
+            joints = rrc.RobotJoints(
+                config["r1_joint_1"],
+                config["r1_joint_2"],
+                config["r1_joint_3"],
+                config["r1_joint_4"],
+                config["r1_joint_5"],
+                config["r1_joint_6"],
+            )
+        elif rob_num == 2:
+            axis = rrc.ExternalAxes(config["r2_cart_joint"])
+            joints = rrc.RobotJoints(
+                config["r2_joint_1"],
+                config["r2_joint_2"],
+                config["r2_joint_3"],
+                config["r2_joint_4"],
+                config["r2_joint_5"],
+                config["r2_joint_6"],
+            )
+
+            abb.send_and_wait(
+                rrc.MoveToJoints(joints, axis, speed, rrc.Zone.FINE), timeout=30
+            )
+            abb.send(rrc.PrintText("MOVE TO {} DONE".format(preset_name)))
 
 
 def _from_move_to_plan(rob_num, robot_pos, config):
@@ -164,3 +221,16 @@ def move_to_frame(abb, f, ext, speed):
     f = _scale_frame(f, 1000)
 
     abb.send_and_wait(rrc.MoveToRobtarget(f, ext, speed, rrc.Zone.FINE))
+
+
+if __name__ == "__main__":
+    rob_num = 2
+    speed = 100
+    preset_name = "camera_attach"
+    # preset_name = "zero_position"
+    # preset_name = "ECL_park_high"
+    # preset_name = "ECL_park_mid"
+    # preset_name = "ECL_park_low"
+
+    robot, abb = connect_to_robot(rob_num)
+    _presets_to_move(abb, rob_num, speed, preset_name)

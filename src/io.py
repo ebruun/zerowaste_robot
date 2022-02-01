@@ -18,7 +18,7 @@ from src_cam.camera.use import (
 from src_cam.camera.convert import convert2png, load_pointcloud
 
 
-def _create_file_path(folder, filename, rob_num=None, i=None):
+def _create_file_path(folder, filename, rob_num=None, i=None, **kwargs):
     """create output data path for config files.
 
     Returns:
@@ -68,7 +68,7 @@ def save_image_zdf_png(i):
     )
 
 
-def load_config_json(folder, name, rob_num, i):
+def load_config_json(folder, name, rob_num=None, i=None):
     filename = _create_file_path(folder, name, rob_num, i)
 
     data = read_data_from_json(filename)
@@ -124,3 +124,4 @@ def load_as_transformation_yaml(folder, name):
 if __name__ == "__main__":
     _create_file_path("transformations/another", "H1_cam_obj.yaml")
     _create_file_path("calibration_data", "pos{:02d}.yaml", i=3)
+    _create_file_path("calibration_data{}", "pos.yaml", rob_num=2)
