@@ -3,7 +3,7 @@ import compas_rrc as rrc
 
 # LOCAL IMPORTS
 from src.RRC_CONNECT import connect_to_robot
-from src.robot_commands import _configs_to_move
+from src.robot_commands import configs_to_move
 from src.io import (
     save_config_json,
     save_frame_as_matrix_yaml,
@@ -15,6 +15,7 @@ from src.io import (
 def get_current_config(robot, abb, rob_num):
 
     config = robot.zero_configuration()
+    print(config)
 
     if rob_num == 1:
         current_joints, current_track = abb.send_and_wait(rrc.GetJoints(), timeout=3)
@@ -54,7 +55,7 @@ def calibration(abb, rob_num, pose_range):
             rob_num,
             i,
         )
-        _configs_to_move(abb, rob_num, config)
+        configs_to_move(abb, rob_num, config)
 
         abb.send(rrc.PrintText("MOVE CONFIG_{0:03} DONE, play for image".format(i)))
         abb.send_and_wait(rrc.Stop(feedback_level=rrc.FeedbackLevel.DONE))
@@ -77,7 +78,7 @@ if __name__ == "__main__":
     robot, abb = connect_to_robot(rob_num)
 
     # config = get_current_config(robot, abb, rob_num)
-    # save_config_json("configs/calibration/R{}","calibration_config_{0:0{width}}.json", config, rob_num, 30)
+    # save_config_json("configs/calibration/R{}","calibration_config_{0:0{width}}.json", config, rob_num, 300)
 
     pose_range = range(1, 31)
     calibration(abb, rob_num, pose_range)

@@ -45,49 +45,11 @@ def move_by_robtarget(abb, speed):
     )
 
 
-def _configs_to_move(abb, rob_num, configs):
+def configs_to_move(abb, rob_num, configs):
     """Taking a list of robot configs in (deg & mm) and move the robot to them"""
 
     abb.send(rrc.PrintText("Moving to specified configs..."))
     speed = 100
-
-    for config in configs:
-        if rob_num == 1:
-            axis = rrc.ExternalAxes(config["r1_cart_joint"])
-            joints = rrc.RobotJoints(
-                config["r1_joint_1"],
-                config["r1_joint_2"],
-                config["r1_joint_3"],
-                config["r1_joint_4"],
-                config["r1_joint_5"],
-                config["r1_joint_6"],
-            )
-        elif rob_num == 2:
-            axis = rrc.ExternalAxes(config["r2_cart_joint"])
-            joints = rrc.RobotJoints(
-                config["r2_joint_1"],
-                config["r2_joint_2"],
-                config["r2_joint_3"],
-                config["r2_joint_4"],
-                config["r2_joint_5"],
-                config["r2_joint_6"],
-            )
-
-        abb.send_and_wait(rrc.MoveToJoints(joints, axis, speed, rrc.Zone.FINE), timeout=30)
-
-
-def _presets_to_move(abb, rob_num, preset_name):
-    """Move robot to preset joint locations"""
-
-    abb.send(rrc.PrintText("Moving to preset: {}".format(preset_name)))
-    speed = 100
-
-    # --load pre-saved config --#
-    configs = load_config_json(
-        "configs/presets/R{}",
-        preset_name + ".json",
-        rob_num,
-    )
 
     for config in configs:
         if rob_num == 1:
@@ -122,7 +84,7 @@ def _presets_to_move(abb, rob_num, preset_name):
             )
 
         abb.send_and_wait(rrc.MoveToJoints(joints, axis, speed, rrc.Zone.FINE), timeout=30)
-        abb.send(rrc.PrintText("MOVE TO {} DONE".format(preset_name)))
+        abb.send(rrc.PrintText("MOVE TO CONFIG DONE"))
 
 
 def _from_move_to_plan(rob_num, robot_pos, config):
@@ -231,7 +193,7 @@ def move_to_frame(abb, f, ext, speed):
 
 
 if __name__ == "__main__":
-    rob_num = 3
+    rob_num = 2
     preset_name = [
         "camera_attach",
         "zero_position",
@@ -241,4 +203,11 @@ if __name__ == "__main__":
     ]
 
     robot, abb = connect_to_robot(rob_num)
-    _presets_to_move(abb, rob_num, preset_name[1])
+
+    configs = load_config_json(
+        "configs/presets/R{}",
+        preset_name[2] + ".json",
+        rob_num,
+    )
+
+    configs_to_move(abb, rob_num, configs)
