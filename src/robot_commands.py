@@ -110,6 +110,16 @@ def _presets_to_move(abb, rob_num, preset_name):
                 config["r2_joint_5"],
                 config["r2_joint_6"],
             )
+        elif rob_num == 3:
+            axis = 0
+            joints = rrc.RobotJoints(
+                config["r3_joint_1"],
+                config["r3_joint_2"],
+                config["r3_joint_3"],
+                config["r3_joint_4"],
+                config["r3_joint_5"],
+                config["r3_joint_6"],
+            )
 
         abb.send_and_wait(rrc.MoveToJoints(joints, axis, speed, rrc.Zone.FINE), timeout=30)
         abb.send(rrc.PrintText("MOVE TO {} DONE".format(preset_name)))
@@ -221,7 +231,7 @@ def move_to_frame(abb, f, ext, speed):
 
 
 if __name__ == "__main__":
-    rob_num = 2
+    rob_num = 3
     preset_name = [
         "camera_attach",
         "zero_position",
@@ -231,4 +241,4 @@ if __name__ == "__main__":
     ]
 
     robot, abb = connect_to_robot(rob_num)
-    _presets_to_move(abb, rob_num, preset_name[0])
+    _presets_to_move(abb, rob_num, preset_name[1])
