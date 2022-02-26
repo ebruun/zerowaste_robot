@@ -42,30 +42,43 @@ def get_current_config(robot, abb, rob_num):
     return config
 
 
-def calibration(abb, rob_num, pose_range):
+def calibration(abbs, rob_nums, pose_range):
     print("START CALIBRATION")
 
     for i in pose_range:
         print("\nCALIBRATION POSE #{}\n".format(i))
 
-        # --move to pre-saved config --#
-        config = load_config_json(
-            "configs/calibration/R{}",
-            "calibration_config_{0:0{width}}.json",
-            rob_num,
-            i,
-        )
-        configs_to_move(abb, rob_num, config)
+        configs = []
+
+        # --read in pre-saved calibration config --#
+        for abb, rob_num in zip(abbs, rob_nums):
+
+            configs.append(
+                load_config_json(
+                    "configs/calibration/R{}",
+                    "calibration_config_{0:0{width}}.json",
+                    rob_num,
+                    i,
+                )
+            )
+
+        # --move to pre-saved calibration config --#
+        for abb, rob_num, config in zip(abbs, rob_nums, configs):
+            configs_to_move(abb, rob_num, config)
 
         abb.send(rrc.PrintText("MOVE CONFIG_{0:03} DONE, play for image".format(i)))
         abb.send_and_wait(rrc.Stop(feedback_level=rrc.FeedbackLevel.DONE))
 
         # --save frame and image data to be used for calibration --#
         abb.send(rrc.PrintText("Saving frame and taking image..."))
-        f_at_config = abb.send_and_wait(rrc.GetFrame(), timeout=3)
+        for abb, rob_num in zip(abbs, rob_nums):
+            print("\nTAKING IMAGE WITH R{}".format(rob_num))
+            f_at_config = abb.send_and_wait(rrc.GetFrame(), timeout=3)
 
-        save_frame_as_matrix_yaml("calibration_data/R{}", "pos{:02d}.yaml", f_at_config, rob_num, i)
-        save_image_zdf_png(i, rob_num)
+            save_frame_as_matrix_yaml(
+                "calibration_data/R{}", "pos{:02d}.yaml", f_at_config, rob_num, i
+            )
+            save_image_zdf_png(i, rob_num)
 
         abb.send(rrc.PrintText("IMAGE COMPLETE, press play to continue"))
         abb.send_and_wait(rrc.Stop(feedback_level=rrc.FeedbackLevel.DONE))
@@ -74,11 +87,13 @@ def calibration(abb, rob_num, pose_range):
 
 
 if __name__ == "__main__":
-    rob_num = 1
-    robot, abb = connect_to_robot(rob_num)
+    # rob_num = 1
+    robot1, abb1 = connect_to_robot(rob_num=1)
+    robot2, abb2 = connect_to_robot(rob_num=2)
 
     # config = get_current_config(robot, abb, rob_num)
     # save_config_json("configs/calibration/R{}","calibration_config_{0:0{width}}.json", config, rob_num, 300)
 
-    pose_range = range(1, 31)
-    calibration(abb, rob_num, pose_range)
+    rng = range(29, 30)
+    calibration([abb1, abb2], rob_nums=[1, 2], pose_range=rng)
+    # calibration(abb1, rob_num = 2, pose_range = rng)

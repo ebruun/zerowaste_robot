@@ -83,8 +83,10 @@ def configs_to_move(abb, rob_num, configs):
                 config["r3_joint_6"],
             )
 
-        abb.send_and_wait(rrc.MoveToJoints(joints, axis, speed, rrc.Zone.FINE), timeout=30)
-        abb.send(rrc.PrintText("MOVE TO CONFIG DONE"))
+        # abb.send_and_wait(rrc.MoveToJoints(joints, axis, speed, rrc.Zone.FINE), timeout=30)
+        # abb.send(rrc.PrintText("MOVE TO CONFIG DONE"))
+
+        abb.send(rrc.MoveToJoints(joints, axis, speed, rrc.Zone.FINE))
 
 
 def _from_move_to_plan(rob_num, robot_pos, config):
@@ -206,7 +208,7 @@ if __name__ == "__main__":
 
     configs = load_config_json(
         "configs/presets/R{}",
-        preset_name[2] + ".json",
+        preset_name[0] + ".json",
         rob_num,
     )
 
