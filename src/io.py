@@ -92,7 +92,7 @@ def load_config_json(folder, name, rob_num=None, i=None):
 
 def load_as_frames_yaml(folder, name):
     file_name = _create_file_path(folder, name)
-    s = cv.FileStorage(file_name, cv.FILE_STORAGE_READ)
+    s = cv.FileStorage(file_name.__str__(), cv.FILE_STORAGE_READ)
 
     i = 0
     H = []
@@ -121,7 +121,7 @@ def load_as_frames_yaml(folder, name):
 
 def load_as_transformation_yaml(folder, name):
     file_name = _create_file_path(folder, name)
-    s = cv.FileStorage(file_name, cv.FILE_STORAGE_READ)
+    s = cv.FileStorage(file_name.__str__(), cv.FILE_STORAGE_READ)
 
     h = s.getNode("PoseState").mat()
 

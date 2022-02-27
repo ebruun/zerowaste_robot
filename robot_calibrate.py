@@ -94,6 +94,6 @@ if __name__ == "__main__":
     # config = get_current_config(robot, abb, rob_num)
     # save_config_json("configs/calibration/R{}","calibration_config_{0:0{width}}.json", config, rob_num, 300)
 
-    rng = range(29, 30)
+    rng = range(1, 30)
     calibration([abb1, abb2], rob_nums=[1, 2], pose_range=rng)
     # calibration(abb1, rob_num = 2, pose_range = rng)
