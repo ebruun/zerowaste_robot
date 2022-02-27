@@ -42,7 +42,7 @@ def pickup(abb, rob_num, robot):
 
     F_touch = F_objects[0].transformed(T)  # Just take first object seen
 
-    F_touch = _offset_frame(F_touch, -352)
+    F_touch = _offset_frame(F_touch, 0)
     F_far = _offset_frame(F_touch, -300)  # almost touching member
 
     print(F_objects)

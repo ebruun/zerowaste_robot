@@ -1,8 +1,13 @@
 {
-    "python.pythonPath": "C:\\Users\\Edvard\\.conda\\envs\\zivid_260_rrc\\python.exe",
+    //PYTHON
+    "python.pythonPath": "C:\\Users\\Edvard\\.conda\\envs\\zivid_261_rrc\\python.exe",
     "python.terminal.activateEnvironment": true,
+
+    //INTEGRATED TERMINAL
     "terminal.integrated.tabs.enabled": true,
     "terminal.integrated.copyOnSelection": true,
+
+    //LINTING
     "python.linting.flake8Enabled": true,
     "python.linting.enabled": true,
     "python.linting.flake8Args": [
