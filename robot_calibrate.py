@@ -87,13 +87,15 @@ def calibration(abbs, rob_nums, pose_range):
 
 
 if __name__ == "__main__":
-    # rob_num = 1
-    robot1, abb1 = connect_to_robot(rob_num=1)
-    robot2, abb2 = connect_to_robot(rob_num=2)
+    # robot, abb = connect_to_robot(rob_num=1)
+    # config = get_current_config(robot, abb, rob_num=1)
+    # save_config_json("configs/calibration/R{}","calibration_config_{0:0{width}}.json", config, rob_num=1, i=300)
 
-    # config = get_current_config(robot, abb, rob_num)
-    # save_config_json("configs/calibration/R{}","calibration_config_{0:0{width}}.json", config, rob_num, 300)
+    # # CALIBRATE BOTH AT SAME TIME
+    # robot1, abb1 = connect_to_robot(rob_num=1)
+    # robot2, abb2 = connect_to_robot(rob_num=2)
+    # calibration([abb1, abb2], rob_nums=[1, 2], pose_range=range(1, 30))
 
-    rng = range(1, 30)
-    calibration([abb1, abb2], rob_nums=[1, 2], pose_range=rng)
-    # calibration(abb1, rob_num = 2, pose_range = rng)
+    # CALIBRATE SINGLE ROBOT
+    robot, abb = connect_to_robot(rob_num=1)
+    calibration([abb], rob_nums=[1], pose_range=range(20, 21))
