@@ -6,7 +6,7 @@ from compas.geometry import Translation
 # LOCAL IMPORTS
 from src.RRC_CONNECT import connect_to_robot
 from src.io import (
-    save_frame_as_matrix_yaml,
+    save_frames_as_matrix_yaml,
     load_as_frames_yaml,
     load_as_transformation_yaml,
 )
@@ -27,9 +27,9 @@ def pickup(abb, rob_num, robot):
     abb.send(rrc.PrintText("PRESS PLAY to start member pickup process..."))
     abb.send_and_wait(rrc.Stop(feedback_level=rrc.FeedbackLevel.DONE))
 
-    f = abb.send_and_wait(rrc.GetFrame(), timeout=3)
+    f = [abb.send_and_wait(rrc.GetFrame(), timeout=3)]
     print("--frame: ", f)
-    save_frame_as_matrix_yaml("transformations", "R{}_H3_wobj_robot.yaml".format(rob_num), f)
+    save_frames_as_matrix_yaml("transformations", "R{}_H3_wobj_robot.yaml".format(rob_num), f)
 
     abb.send(rrc.PrintText("PRESS PLAY to read in transformation matrices..."))
     abb.send_and_wait(rrc.Stop(feedback_level=rrc.FeedbackLevel.DONE))
@@ -46,8 +46,6 @@ def pickup(abb, rob_num, robot):
     T = Transformation.concatenated(T3, T2)
 
     F_touch = F_objects[0].transformed(T)  # Just take first object seen
-
-    F_touch = _offset_frame(F_touch, 0)
     F_far = _offset_frame(F_touch, -300)  # almost touching member
 
     speed = 100

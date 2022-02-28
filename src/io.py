@@ -10,14 +10,6 @@ from compas.geometry import Transformation
 from compas_fab.robots import Configuration
 from compas_fab.utilities import read_data_from_json
 
-# LOCAL IMPORTS
-from src_cam.camera.use import (
-    camera_connect,
-    camera_capture_settings,
-    camera_capture_and_save,
-)
-from src_cam.camera.convert import convert2png, load_pointcloud
-
 
 def _create_file_path(folder, filename, rob_num=None, i=None):
     """create output data path for config files.
@@ -36,8 +28,9 @@ def _create_file_path(folder, filename, rob_num=None, i=None):
     return path
 
 
-def save_config_json(folder, name, config, rob_num=None, i=None):
-    filepath = _create_file_path(folder, name, rob_num, i)
+# -- SAVING DATA FUNCTIONS --#
+def save_config_json(config, folder, output_file):
+    filepath = _create_file_path(folder, output_file)
 
     c = config.to_data()
 
@@ -45,42 +38,26 @@ def save_config_json(folder, name, config, rob_num=None, i=None):
         json.dump(c, f, indent=4)
 
 
-def save_frame_as_matrix_yaml(folder, name, frame, rob_num=None, i=None):
-    filepath = _create_file_path(folder, name, rob_num, i)
-    s = cv.FileStorage(filepath.__str__(), cv.FileStorage_WRITE)
+def save_frames_as_matrix_yaml(frames, folder, output_file):
+    file_path = _create_file_path(folder, output_file)
+    s = cv.FileStorage(file_path.__str__(), cv.FileStorage_WRITE)
 
-    t = Transformation.from_frame(frame)
+    if len(frames) == 1:
+        T = Transformation.from_frame(frames[0])
+        PoseState = np.array(T)
+        s.write("PoseState", PoseState)
+    else:
+        for i, f in enumerate(frames):
+            T = Transformation.from_frame(f)
+            PoseState = np.array(T)
+            s.write("PoseState{}".format(i), PoseState)
 
-    PoseState = np.array(t)
-    s.write("PoseState", PoseState)
     s.release()
 
 
-def save_image_zdf_png(i, rob_num):
-    filename = "img{:02d}".format(i)
-
-    camera = camera_connect(rob_num)
-    settings = camera_capture_settings(camera)
-    camera_capture_and_save(
-        camera,
-        settings,
-        "calibration_data/R{}".format(rob_num),
-        filename + ".zdf",
-    )
-
-    pc = load_pointcloud(
-        folder="calibration_data/R{}".format(rob_num), input_file=filename + ".zdf"
-    )
-
-    _ = convert2png(
-        pointcloud=pc,
-        folder="calibration_data/R{}/_imgs".format(rob_num),
-        output_file=filename + "_rgb.png",
-    )
-
-
-def load_config_json(folder, name, rob_num=None, i=None):
-    filename = _create_file_path(folder, name, rob_num, i)
+# -- LOADING DATA FUNCTIONS --#
+def load_config_json(folder, name):
+    filename = _create_file_path(folder, name)
 
     data = read_data_from_json(filename)
     config = Configuration.from_data(data)
