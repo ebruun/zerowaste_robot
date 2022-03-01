@@ -5,8 +5,7 @@ import pathlib
 import json
 
 # COMPAS IMPORTS
-from compas.geometry import Frame
-from compas.geometry import Transformation
+from compas.geometry import Transformation, Frame, allclose
 from compas_fab.robots import Configuration
 from compas_fab.utilities import read_data_from_json
 
@@ -53,6 +52,27 @@ def save_frames_as_matrix_yaml(frames, folder, output_file):
             s.write("PoseState{}".format(i), PoseState)
 
     s.release()
+
+
+# Create wobj to world 0 transform (hard-coded values from robot studio)
+def save_wobj_as_matrix_yaml(rob_num, folder, output_file):
+
+    if rob_num == 1:
+        q1 = [0.999971, 0.000727707, -0.00129108, -0.00745658]
+        f = Frame.from_quaternion(q1, point=[-680.624, 1567.49, 823.009])
+        q2 = f.quaternion
+        allclose(q1, q2, tol=1e-03)
+    elif rob_num == 2:
+        q1 = [0.999964, 0.00426176, -0.00158504, -0.00717332]
+        f = Frame.from_quaternion(q1, point=[-681.039, 1564.71, 817.284])
+        q2 = f.quaternion
+        allclose(q1, q2, tol=1e-03)
+
+    save_frames_as_matrix_yaml(
+        frames=[f],
+        folder=folder,
+        output_file=output_file,
+    )
 
 
 # -- LOADING DATA FUNCTIONS --#
@@ -110,6 +130,9 @@ def load_as_transformation_yaml(folder, name):
 
 
 if __name__ == "__main__":
-    _create_file_path("transformations/another", "H1_cam_obj.yaml")
-    _create_file_path("calibration_data", "pos{:02d}.yaml", i=3)
-    _create_file_path("calibration_data{}", "pos.yaml", rob_num=2)
+    # _create_file_path("transformations/another", "H1_cam_obj.yaml")
+    # _create_file_path("calibration_data", "pos{:02d}.yaml", i=3)
+    # _create_file_path("calibration_data{}", "pos.yaml", rob_num=2)
+
+    rob_num = 2
+    # save_wobj_as_matrix_yaml(rob_num,"transformations","R{}_H4_world_wobj.yaml".format(rob_num))

@@ -23,7 +23,7 @@ def _offset_frame(f, offset):
 
 
 # Pickup a member seen by camera
-def pickup(abb, rob_num, robot):
+def pick_from_camera(abb, rob_num):
     abb.send(rrc.PrintText("PRESS PLAY to start member pickup process..."))
     abb.send_and_wait(rrc.Stop(feedback_level=rrc.FeedbackLevel.DONE))
 
@@ -67,6 +67,6 @@ def pickup(abb, rob_num, robot):
 
 if __name__ == "__main__":
     rob_num = 1
-    robot, abb = connect_to_robot(rob_num)
+    # robot, abb = connect_to_robot(rob_num)
 
-    pickup(abb, rob_num, robot)
+    # pick_from_camera(abb, rob_num)

@@ -1,14 +1,12 @@
+import glob
+
 # COMPAS IMPORTS
 import compas_rrc as rrc
 
 # LOCAL IMPORTS
 from src.RRC_CONNECT import connect_to_robot
 from src.robot_commands import configs_to_move
-from src.io import (
-    save_config_json,
-    save_frames_as_matrix_yaml,
-    load_config_json,
-)
+from src.io import save_config_json, save_frames_as_matrix_yaml, load_config_json, _create_file_path
 
 from src_cam.camera.use import (
     camera_connect,
@@ -20,37 +18,48 @@ from src_cam.utility.io import load_pointcloud
 from src_cam.camera.convert import convert2png
 
 
-def get_current_config(robot, abb, rob_num):
+def _get_current_config(robot, abb, rob_num):
 
     config = robot.zero_configuration()
-    print(config)
 
-    if rob_num == 1:
+    if rob_num in [1, 2]:
         current_joints, current_track = abb.send_and_wait(rrc.GetJoints(), timeout=3)
+        config["r{}_cart_joint".format(rob_num)] = current_track[0]
+    elif rob_num in [3]:
+        current_joints = abb.send_and_wait(rrc.GetJoints(), timeout=3)
 
-        config["r1_cart_joint"] = current_track[0]
-        config["r1_joint_1"] = current_joints[0]
-        config["r1_joint_2"] = current_joints[1]
-        config["r1_joint_3"] = current_joints[2]
-        config["r1_joint_4"] = current_joints[3]
-        config["r1_joint_5"] = current_joints[4]
-        config["r1_joint_6"] = current_joints[5]
-
-    elif rob_num == 2:
-        current_joints, current_track = abb.send_and_wait(rrc.GetJoints(), timeout=3)
-
-        config["r2_cart_joint"] = current_track[0]
-        config["r2_joint_1"] = current_joints[0]
-        config["r2_joint_2"] = current_joints[1]
-        config["r2_joint_3"] = current_joints[2]
-        config["r2_joint_4"] = current_joints[3]
-        config["r2_joint_5"] = current_joints[4]
-        config["r2_joint_6"] = current_joints[5]
+    config["r{}_joint_1".format(rob_num)] = current_joints[0]
+    config["r{}_joint_2".format(rob_num)] = current_joints[1]
+    config["r{}_joint_3".format(rob_num)] = current_joints[2]
+    config["r{}_joint_4".format(rob_num)] = current_joints[3]
+    config["r{}_joint_5".format(rob_num)] = current_joints[4]
+    config["r{}_joint_6".format(rob_num)] = current_joints[5]
 
     return config
 
 
-def calibration(abbs, rob_nums, pose_range, folders, filenames):
+def _multi_connect(rob_nums):
+    robots = []
+    abbs = []
+    for rob_num in rob_nums:
+        robot, abb = connect_to_robot(rob_num)
+        robots.append(robot)
+        abbs.append(abb)
+
+    return abbs, robots
+
+
+def _generate_range(folder, pose_range=False):
+    if not pose_range:
+        a = _create_file_path(folder, "")
+        num_files = len(glob.glob(a.__str__() + "/*"))
+
+        pose_range = range(1, num_files)
+
+    return pose_range
+
+
+def robot_camera_aquisition(abbs, rob_nums, pose_range, folders, filenames):
     print("START AQUISITION PROCESS")
 
     for i in pose_range:
@@ -117,31 +126,49 @@ def calibration(abbs, rob_nums, pose_range, folders, filenames):
     print("AQUISITIONS DONE")
 
 
+def calibration(rob_nums, pose_range=False):
+    folders = ["configs/calibration/R{}", "data/calibration/R{}"]
+    filenames = ["calibration_config_{0:0{width}}.json", "pos{:02d}.yaml", "img{:02d}"]
+
+    abbs, _ = _multi_connect(rob_nums)
+    pose_range = _generate_range(folders[0].format(rob_nums[0]), pose_range)
+
+    robot_camera_aquisition(abbs, rob_nums, pose_range, folders, filenames)
+
+
+def stitching(rob_nums, pose_range=False):
+    folders = ["configs/stitch/R{}", "data/stitch/R{}"]
+    filenames = ["stitch_config_{0:0{width}}.json", "pos{:02d}.yaml", "img{:02d}"]
+
+    abbs, _ = _multi_connect(rob_nums)
+    pose_range = _generate_range(folders[0].format(rob_nums[0]), pose_range)
+
+    robot_camera_aquisition(abbs, rob_nums, pose_range, folders, filenames)
+
+
+def robot_config_saving(rob_nums, i, n_config):
+    folders = ["configs/calibration/R{}", "configs/stitch/R{}", "configs/_test/R{}"]
+    filenames = [
+        "calibration_config_{0:0{width}}.json",
+        "stitch_config_{0:0{width}}.json",
+        "test_config_{0:0{width}}.json",
+    ]
+
+    abbs, robots = _multi_connect(rob_nums)
+
+    for abb, robot, rob_num in zip(abbs, robots, rob_nums):
+        config = _get_current_config(robot, abb, rob_num)
+
+        save_config_json(
+            config,
+            folder=folders[i].format(rob_num),
+            output_file=filenames[i].format(n_config, width=3),
+        )
+
+
 if __name__ == "__main__":
-    # rob_num=1
-    # robot, abb = connect_to_robot(rob_num)
-    # config = get_current_config(robot, abb, rob_num)
-    # save_config_json(
-    #     config,
-    #     folder="configs/stitch/R{}".format(rob_num),
-    #     output_file="stitch_config_{0:0{width}}.json".format(5,width=3)
-    # )
 
-    # # CALIBRATE BOTH AT SAME TIME
-    # robot1, abb1 = connect_to_robot(rob_num=1)
-    # robot2, abb2 = connect_to_robot(rob_num=2)
-    # calibration([abb1, abb2], rob_nums=[1, 2], pose_range=range(1, 30))
-
-    # # CALIBRATE SINGLE ROBOT
-    # robot, abb = connect_to_robot(rob_num=1)
-    # calibration([abb], rob_nums=[1], pose_range=range(1, 2))
-
-    # STITCH DATA SINGLE ROBOT
-    robot, abb = connect_to_robot(rob_num=1)
-    calibration(
-        [abb],
-        rob_nums=[1],
-        pose_range=range(4, 6),
-        folders=["configs/stitch/R{}", "data_stitch/R{}"],
-        filenames=["stitch_config_{0:0{width}}.json", "pos{:02d}.yaml", "img{:02d}"],
-    )
+    rob_nums = [1, 2]
+    # robot_config_saving(rob_nums,i=2,n_config=3)
+    calibration(rob_nums, pose_range=False)
+    # stitching(rob_nums, pose_range=False)
