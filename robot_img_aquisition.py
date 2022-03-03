@@ -185,7 +185,7 @@ def robot_config_saving(rob_nums, i, n_config):
 if __name__ == "__main__":
 
     rob_nums = [1, 2]
-    robot_config_saving(rob_nums, i=3, n_config=7)
+    robot_config_saving(rob_nums, i=3, n_config=15)
     # calibration(rob_nums, pose_range=False)
     # stitching(rob_nums, pose_range=False)
     # stitching_shed(rob_nums, pose_range=range(5,7))
