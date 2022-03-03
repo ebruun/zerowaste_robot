@@ -2,4 +2,6 @@
 /data/calibration/R2/*
 /data/stitch/R1/*
 /data/stitch/R2/*
+/data/stitch_shed/R1/*
+/data/stitch_shed/R2/*
 /configs/_test

@@ -95,7 +95,7 @@ def stitch_pcd(rob_nums, pc_range, voxel_size, folders, filenames):
 
 if __name__ == "__main__":
 
-    folders = ["data_stitch/R{}", "data_stitch", "transformations"]
+    folders = ["data/stitch_shed/R{}", "data/stitch_shed", "transformations"]
     filenames = [
         "img{:02d}.zdf",
         "R{}_H2_robot_cam.yaml",
@@ -106,12 +106,14 @@ if __name__ == "__main__":
         "R{}_pcd_stitched.pts",
     ]
 
-    # rob_nums = [1,2]
+    rob_nums = [1, 2]
     # _transform_pointclouds(
     #     rob_nums=rob_nums,
-    #     pose_range=range(1, 6),
+    #     pose_range=range(1, 7),
     #     folders=folders,
     #     filenames=filenames
     # )
 
-    # stitch_pcd(rob_nums=rob_nums, pc_range=range(1, 6), voxel_size=0.1, folders=folders, filenames=filenames)
+    stitch_pcd(
+        rob_nums=rob_nums, pc_range=range(1, 7), voxel_size=1, folders=folders, filenames=filenames
+    )
