@@ -8,10 +8,7 @@ from compas.geometry import Transformation
 # LOCAL IMPORTS
 from src.RRC_CONNECT import connect_to_robot
 from src.robot_commands import configs_to_move
-from src.io import (
-    load_as_transformation_yaml,
-    _create_file_path,
-)
+from src.io import load_as_transformation_yaml, _create_file_path, load_o3d_view_settings
 
 from src_cam.utility.io import load_pointcloud
 
@@ -62,7 +59,7 @@ def stitch_pcd(rob_nums, pc_range, voxel_size, folders, filenames):
             )
 
             pcd = pcd.voxel_down_sample(voxel_size=voxel_size)
-            pcd, _ = pcd.remove_statistical_outlier(nb_neighbors=5, std_ratio=0.5)
+            pcd, _ = pcd.remove_statistical_outlier(nb_neighbors=20, std_ratio=0.1)
 
             p = np.asarray(pcd.points)
             p_color = np.asarray(pcd.colors)
@@ -77,12 +74,19 @@ def stitch_pcd(rob_nums, pc_range, voxel_size, folders, filenames):
         pcd_combined.points = o3d.utility.Vector3dVector(points_combined)
         pcd_combined.colors = o3d.utility.Vector3dVector(colors_combined)
 
+        # pcd_combined,_ = pcd_combined.remove_statistical_outlier(nb_neighbors=5, std_ratio=0.5)
+
+        vis_settings = load_o3d_view_settings(folders[1], filenames[7].format(rob_num))
         o3d.visualization.draw_geometries(
             [pcd_combined],
-            zoom=0.399,
-            front=[-0.702, 0.493, 0.512],
-            lookat=[-0.141, 1.503, 0.5210],
-            up=[0.4154, -0.3007, 0.8584],
+            left=10,
+            top=50,
+            width=1600,
+            height=900,
+            zoom=vis_settings["zoom"],
+            front=vis_settings["front"],
+            lookat=vis_settings["lookat"],
+            up=vis_settings["up"],
         )
 
         o3d.io.write_point_cloud(
@@ -104,16 +108,17 @@ if __name__ == "__main__":
         "img{:02d}_trns.ply",
         "img_notrans{:02d}.ply",
         "R{}_pcd_stitched.pts",
+        "_o3d_view_settings_R{}.json",
     ]
 
     rob_nums = [1, 2]
     # _transform_pointclouds(
     #     rob_nums=rob_nums,
-    #     pose_range=range(1, 7),
+    #     pose_range=range(41, 50),
     #     folders=folders,
     #     filenames=filenames
     # )
 
     stitch_pcd(
-        rob_nums=rob_nums, pc_range=range(1, 7), voxel_size=1, folders=folders, filenames=filenames
+        rob_nums=rob_nums, pc_range=range(1, 50), voxel_size=7, folders=folders, filenames=filenames
     )

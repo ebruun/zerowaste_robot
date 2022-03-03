@@ -129,6 +129,13 @@ def load_as_transformation_yaml(folder, name):
     return T
 
 
+def load_o3d_view_settings(folder, name):
+    file_path = _create_file_path(folder, name)
+    data = read_data_from_json(file_path)
+
+    return data["trajectory"][0]
+
+
 if __name__ == "__main__":
     # _create_file_path("transformations/another", "H1_cam_obj.yaml")
     # _create_file_path("calibration_data", "pos{:02d}.yaml", i=3)
@@ -136,3 +143,8 @@ if __name__ == "__main__":
 
     rob_num = 2
     # save_wobj_as_matrix_yaml(rob_num,"transformations","R{}_H4_world_wobj.yaml".format(rob_num))
+
+    folder = "data/stitch_shed"
+    name = "_o3d_view_settings_R{}.json".format(rob_num)
+    a = load_o3d_view_settings(folder, name)
+    print(a)
