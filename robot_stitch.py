@@ -116,7 +116,7 @@ def stitch_separate_robots(rob_nums, pc_range, vis_on=False):
         )
 
 
-def stitch_full(rob_nums, vis_on=False):
+def stitch_full(vis_on=False):
     folders = ["data/stitch_shed/R{}", "data/stitch_shed"]
     filenames = [
         "_R{}_pcd_stitched.pts",
@@ -133,6 +133,7 @@ def stitch_full(rob_nums, vis_on=False):
 
     print("START FULL POINTCLOUD STITCH\n")
 
+    rob_nums = [1, 2]
     point_data = []
     color_data = []
     for rob_num in rob_nums:
@@ -188,18 +189,15 @@ if __name__ == "__main__":
     rob_nums = [1, 2]
     # _transform_pointclouds(
     #     rob_nums=rob_nums,
-    #     pose_range=range(59, 60),
+    #     pose_range=range(60, 100),
     #     folders=folders,
     #     filenames=filenames
     # )
 
     # stitch_separate_robots(
     #     rob_nums=rob_nums,
-    #     pc_range=range(1, 60),
+    #     pc_range=range(1, 100),
     #     vis_on=False,
     # )
 
-    stitch_full(
-        rob_nums=rob_nums,
-        vis_on=True,
-    )
+    stitch_full(vis_on=True)
