@@ -44,57 +44,130 @@ def _transform_pointclouds(rob_nums, pose_range, folders, filenames):
     print("\nPOINTCLOUD TRANSFORMS DONE")
 
 
-def stitch_pcd(rob_nums, pc_range, voxel_size, folders, filenames):
+def _visualize_pcd(pcd, folder, filename):
+    vis_settings = load_o3d_view_settings(folder, filename)
+    o3d.visualization.draw_geometries(
+        [pcd],
+        left=10,
+        top=50,
+        width=1600,
+        height=900,
+        zoom=vis_settings["zoom"],
+        front=vis_settings["front"],
+        lookat=vis_settings["lookat"],
+        up=vis_settings["up"],
+    )
+
+
+def stitch_separate_robots(rob_nums, pc_range, vis_on=False):
+    folders = ["data/stitch_shed/R{}"]
+    filenames = [
+        "img{:02d}_trns.ply",
+        "_R{}_pcd_stitched.pts",
+        "_o3d_view_settings_R{}.json",
+    ]
+
+    pcd_vars = {
+        "voxels": 8,
+        "neighbors": 20,
+        "std_dev": 0.1,
+        "scale": 1000,
+    }
 
     print("START POINTCLOUD STITCH\n")
-
     for rob_num in rob_nums:
         point_data = []
         color_data = []
+
         for i in pc_range:
             pcd = o3d.io.read_point_cloud(
                 _create_file_path(
-                    folder=folders[0].format(rob_num), filename=filenames[4].format(i)
+                    folder=folders[0].format(rob_num), filename=filenames[0].format(i)
                 ).__str__()
             )
 
-            pcd = pcd.voxel_down_sample(voxel_size=voxel_size)
-            pcd, _ = pcd.remove_statistical_outlier(nb_neighbors=20, std_ratio=0.1)
+            pcd = pcd.voxel_down_sample(voxel_size=pcd_vars["voxels"])
+            pcd, _ = pcd.remove_statistical_outlier(
+                nb_neighbors=pcd_vars["neighbors"], std_ratio=pcd_vars["std_dev"]
+            )
 
-            p = np.asarray(pcd.points)
-            p_color = np.asarray(pcd.colors)
+            point_data.append(np.asarray(pcd.points))
+            color_data.append(np.asarray(pcd.colors))
 
-            point_data.append(p)
-            color_data.append(p_color)
-
-        points_combined = np.concatenate(point_data, axis=0) / 1000  # mm -> m
+        points_combined = np.concatenate(point_data, axis=0) / pcd_vars["scale"]  # mm -> m
         colors_combined = np.concatenate(color_data, axis=0)
 
         pcd_combined = o3d.geometry.PointCloud()
         pcd_combined.points = o3d.utility.Vector3dVector(points_combined)
         pcd_combined.colors = o3d.utility.Vector3dVector(colors_combined)
 
-        # pcd_combined,_ = pcd_combined.remove_statistical_outlier(nb_neighbors=5, std_ratio=0.5)
-
-        vis_settings = load_o3d_view_settings(folders[1], filenames[7].format(rob_num))
-        o3d.visualization.draw_geometries(
-            [pcd_combined],
-            left=10,
-            top=50,
-            width=1600,
-            height=900,
-            zoom=vis_settings["zoom"],
-            front=vis_settings["front"],
-            lookat=vis_settings["lookat"],
-            up=vis_settings["up"],
-        )
+        if vis_on:
+            _visualize_pcd(
+                pcd_combined,
+                folders[0].format(rob_num),
+                filenames[2].format(rob_num),
+            )
 
         o3d.io.write_point_cloud(
-            _create_file_path(folder=folders[1], filename=filenames[6].format(rob_num)).__str__(),
+            _create_file_path(
+                folder=folders[0].format(rob_num), filename=filenames[1].format(rob_num)
+            ).__str__(),
             pcd_combined,
         )
 
-    print("\nPOINTCLOUD STITCH DONE")
+
+def stitch_full(rob_nums, vis_on=False):
+    folders = ["data/stitch_shed/R{}", "data/stitch_shed"]
+    filenames = [
+        "_R{}_pcd_stitched.pts",
+        "pcd_full.pts",
+        "_o3d_view_settings_full.json",
+    ]
+
+    pcd_vars = {
+        "voxels": 0.004,
+        "neighbors": 5,
+        "std_dev": 1.0,
+        "scale": 1,
+    }
+
+    print("START FULL POINTCLOUD STITCH\n")
+
+    point_data = []
+    color_data = []
+    for rob_num in rob_nums:
+        pcd = o3d.io.read_point_cloud(
+            _create_file_path(
+                folder=folders[0].format(rob_num), filename=filenames[0].format(rob_num)
+            ).__str__()
+        )
+
+        point_data.append(np.asarray(pcd.points))
+        color_data.append(np.asarray(pcd.colors))
+
+    points_combined = np.concatenate(point_data, axis=0) / pcd_vars["scale"]  # mm -> m
+    colors_combined = np.concatenate(color_data, axis=0)
+
+    pcd_combined = o3d.geometry.PointCloud()
+    pcd_combined.points = o3d.utility.Vector3dVector(points_combined)
+    pcd_combined.colors = o3d.utility.Vector3dVector(colors_combined)
+
+    pcd_combined = pcd_combined.voxel_down_sample(voxel_size=pcd_vars["voxels"])
+    # pcd_combined, _ = pcd_combined.remove_statistical_outlier(nb_neighbors=pcd_vars['neighbors'], std_ratio=pcd_vars['std_dev'])
+
+    if vis_on:
+        _visualize_pcd(
+            pcd_combined,
+            folders[1].format(rob_num),
+            filenames[2],
+        )
+
+    o3d.io.write_point_cloud(
+        _create_file_path(
+            folder=folders[1].format(rob_num), filename=filenames[1].format(rob_num)
+        ).__str__(),
+        pcd_combined,
+    )
 
 
 if __name__ == "__main__":
@@ -109,16 +182,24 @@ if __name__ == "__main__":
         "img_notrans{:02d}.ply",
         "R{}_pcd_stitched.pts",
         "_o3d_view_settings_R{}.json",
+        "full_pcd_stitched.pts",
     ]
 
     rob_nums = [1, 2]
     # _transform_pointclouds(
     #     rob_nums=rob_nums,
-    #     pose_range=range(41, 50),
+    #     pose_range=range(59, 60),
     #     folders=folders,
     #     filenames=filenames
     # )
 
-    stitch_pcd(
-        rob_nums=rob_nums, pc_range=range(1, 50), voxel_size=7, folders=folders, filenames=filenames
+    # stitch_separate_robots(
+    #     rob_nums=rob_nums,
+    #     pc_range=range(1, 60),
+    #     vis_on=False,
+    # )
+
+    stitch_full(
+        rob_nums=rob_nums,
+        vis_on=True,
     )
