@@ -4,7 +4,7 @@ import glob
 import compas_rrc as rrc
 
 # LOCAL IMPORTS
-from src.RRC_CONNECT import connect_to_robot
+from src.RRC_CONNECT import connect_to_robots
 from src.robot_commands import configs_to_move
 from src.io import save_config_json, save_frames_as_matrix_yaml, load_config_json, _create_file_path
 
@@ -36,17 +36,6 @@ def _get_current_config(robot, abb, rob_num):
     config["r{}_joint_6".format(rob_num)] = current_joints[5]
 
     return config
-
-
-def _multi_connect(rob_nums):
-    robots = []
-    abbs = []
-    for rob_num in rob_nums:
-        robot, abb = connect_to_robot(rob_num)
-        robots.append(robot)
-        abbs.append(abb)
-
-    return abbs, robots
 
 
 def _generate_range(folder, pose_range=False):
@@ -131,7 +120,7 @@ def calibration(rob_nums, pose_range=False):
     folders = ["configs/calibration/R{}", "data/calibration/R{}"]
     filenames = ["calibration_config_{0:0{width}}.json", "pos{:02d}.yaml", "img{:02d}"]
 
-    abbs, _ = _multi_connect(rob_nums)
+    abbs, _ = connect_to_robots(rob_nums)
     pose_range = _generate_range(folders[0].format(rob_nums[0]), pose_range)
 
     robot_camera_aquisition(abbs, rob_nums, pose_range, folders, filenames)
@@ -141,7 +130,7 @@ def stitching(rob_nums, pose_range=False):
     folders = ["configs/stitch/R{}", "data/stitch/R{}"]
     filenames = ["stitch_config_{0:0{width}}.json", "pos{:02d}.yaml", "img{:02d}"]
 
-    abbs, _ = _multi_connect(rob_nums)
+    abbs, _ = connect_to_robots(rob_nums)
     pose_range = _generate_range(folders[0].format(rob_nums[0]), pose_range)
 
     robot_camera_aquisition(abbs, rob_nums, pose_range, folders, filenames)
@@ -151,7 +140,7 @@ def stitching_shed(rob_nums, pose_range=False):
     folders = ["configs/stitch_shed/R{}", "data/stitch_shed/R{}"]
     filenames = ["stitch_shed_{0:0{width}}.json", "pos{:02d}.yaml", "img{:02d}"]
 
-    abbs, _ = _multi_connect(rob_nums)
+    abbs, _ = connect_to_robots(rob_nums)
     pose_range = _generate_range(folders[0].format(rob_nums[0]), pose_range)
 
     robot_camera_aquisition(abbs, rob_nums, pose_range, folders, filenames)
@@ -171,7 +160,7 @@ def robot_config_saving(rob_nums, i, n_config):
         "stitch_shed_{0:0{width}}.json",
     ]
 
-    abbs, robots = _multi_connect(rob_nums)
+    abbs, robots = connect_to_robots(rob_nums)
 
     for abb, robot, rob_num in zip(abbs, robots, rob_nums):
         config = _get_current_config(robot, abb, rob_num)
@@ -185,9 +174,9 @@ def robot_config_saving(rob_nums, i, n_config):
 
 if __name__ == "__main__":
 
-    rob_nums = [1]
+    rob_nums = [1, 2]
     # robot_config_saving(rob_nums, i=3, n_config=99)
 
     # calibration(rob_nums, pose_range=False)
-    # stitching(rob_nums, pose_range=False)
-    stitching_shed(rob_nums, pose_range=range(61, 62))
+    stitching(rob_nums, pose_range=False)
+    # stitching_shed(rob_nums, pose_range=range(61, 62))

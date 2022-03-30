@@ -3,13 +3,14 @@
 # PYTHON IMPORTS
 # PYTHON IMPORTS
 import math
+from socket import timeout
 
 # COMPAS IMPORTS
 import compas_rrc as rrc
 from compas_fab.robots import to_radians
 
 # LOCAL IMPORTS
-from src.RRC_CONNECT import connect_to_robot
+from src.RRC_CONNECT import connect_to_robots
 from src.io import load_config_json
 
 
@@ -86,6 +87,7 @@ def configs_to_move(abb, rob_num, configs):
         # abb.send_and_wait(rrc.MoveToJoints(joints, axis, speed, rrc.Zone.FINE), timeout=30)
         # abb.send(rrc.PrintText("MOVE TO CONFIG DONE"))
 
+        # abb.send_and_wait(rrc.PrintText("MOVE TO CONFIG DONE"),timeout=2)
         abb.send(rrc.MoveToJoints(joints, axis, speed, rrc.Zone.FINE))
 
 
@@ -195,7 +197,7 @@ def move_to_frame(abb, f, ext, speed):
 
 
 if __name__ == "__main__":
-    rob_num = 2
+    rob_nums = [1, 2]
     preset_name = [
         "camera_attach",
         "zero_position",
@@ -204,12 +206,18 @@ if __name__ == "__main__":
         "ECL_park_low",
     ]
 
-    robot, abb = connect_to_robot(rob_num)
+    abbs, _ = connect_to_robots(rob_nums)
 
-    configs = load_config_json(
-        "configs/presets/R{}",
-        preset_name[0] + ".json",
-        rob_num,
-    )
+    configs = []
+    for abb, rob_num in zip(abbs, rob_nums):
 
-    configs_to_move(abb, rob_num, configs)
+        configs.append(
+            load_config_json(
+                "configs/presets/R{}".format(rob_num),
+                preset_name[0] + ".json",
+            )
+        )
+
+    for abb, rob_num, config in zip(abbs, rob_nums, configs):
+        configs_to_move(abb, rob_num, config)
+        print("move, ", rob_num)  # slow down sending code, avoid block

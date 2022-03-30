@@ -3,7 +3,7 @@ import compas_rrc as rrc
 
 
 # Connect to robot
-def connect_to_robot(rob_num):
+def _connect_to_single_robot(rob_num):
 
     ros = rrc.RosClient()
     ros.run()
@@ -28,3 +28,25 @@ def connect_to_robot(rob_num):
 
     abb.send(rrc.PrintText("Starting..."))
     return robot, abb
+
+
+def _connect_to_multiple_robot(rob_nums):
+    robots = []
+    abbs = []
+    for rob_num in rob_nums:
+        robot, abb = _connect_to_single_robot(rob_num)
+        robots.append(robot)
+        abbs.append(abb)
+
+    return abbs, robots
+
+
+def connect_to_robots(rob_nums):
+    return _connect_to_multiple_robot(rob_nums)
+
+
+if __name__ == "__main__":
+    rob_nums = [1, 2]
+    abbs, robots = connect_to_robots(rob_nums)
+
+    print(robots)
