@@ -4,7 +4,7 @@ from compas.geometry import Transformation
 from compas.geometry import Translation
 
 # LOCAL IMPORTS
-from src.RRC_CONNECT import connect_to_robot
+from src.RRC_CONNECT import connect_to_robots
 from src.io import (
     save_frames_as_matrix_yaml,
     load_as_frames_yaml,
@@ -66,7 +66,6 @@ def pick_from_camera(abb, rob_num):
 
 
 if __name__ == "__main__":
-    rob_num = 1
-    # robot, abb = connect_to_robot(rob_num)
-
-    # pick_from_camera(abb, rob_num)
+    rob_nums = [1]
+    abbs, _ = connect_to_robots(rob_nums)
+    pick_from_camera(abbs[0], rob_nums)

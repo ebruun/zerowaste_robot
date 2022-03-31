@@ -1,49 +1,32 @@
-# this file is just a random collection of robot control functions, need to clean up later
-
-# PYTHON IMPORTS
 # PYTHON IMPORTS
 import math
-from socket import timeout
 
 # COMPAS IMPORTS
 import compas_rrc as rrc
-from compas_fab.robots import to_radians
 
 # LOCAL IMPORTS
 from src.RRC_CONNECT import connect_to_robots
 from src.io import load_config_json
 
 
-def move_by_frame(abb, speed):
+def get_current_config(robot, abb, rob_num):
 
-    abb.send(rrc.PrintText("Move by frame"))
-    frame = abb.send_and_wait(rrc.GetFrame(), timeout=10)
+    config = robot.zero_configuration()
 
-    # Change in Global Z axis (in millimeters)
-    frame.point[2] += 100
+    if rob_num in [1, 2]:
+        current_joints, current_track = abb.send_and_wait(rrc.GetJoints(), timeout=3)
+        config["r{}_cart_joint".format(rob_num)] = current_track[0]
+    elif rob_num in [3]:
+        current_joints = abb.send_and_wait(rrc.GetJoints(), timeout=3)
 
-    # Move robot the new pos
-    return abb.send_and_wait(
-        rrc.MoveToFrame(frame, speed, rrc.Zone.FINE, rrc.Motion.LINEAR),
-        timeout=10,
-    )
+    config["r{}_joint_1".format(rob_num)] = current_joints[0]
+    config["r{}_joint_2".format(rob_num)] = current_joints[1]
+    config["r{}_joint_3".format(rob_num)] = current_joints[2]
+    config["r{}_joint_4".format(rob_num)] = current_joints[3]
+    config["r{}_joint_5".format(rob_num)] = current_joints[4]
+    config["r{}_joint_6".format(rob_num)] = current_joints[5]
 
-
-def move_by_robtarget(abb, speed):
-    abb.send(rrc.PrintText("Move by rob target"))
-    frame, external_axes = abb.send_and_wait(rrc.GetRobtarget())
-
-    # Change X value of the frame
-    frame.point[0] -= 50
-
-    # Move track forward
-    external_axes[0] += 200
-
-    # Move robot the new pos
-    return abb.send_and_wait(
-        rrc.MoveToRobtarget(frame, external_axes, speed, rrc.Zone.FINE),
-        timeout=10,
-    )
+    return config
 
 
 def configs_to_move(abb, rob_num, configs):
@@ -87,113 +70,7 @@ def configs_to_move(abb, rob_num, configs):
         # abb.send_and_wait(rrc.MoveToJoints(joints, axis, speed, rrc.Zone.FINE), timeout=30)
         # abb.send(rrc.PrintText("MOVE TO CONFIG DONE"))
 
-        # abb.send_and_wait(rrc.PrintText("MOVE TO CONFIG DONE"),timeout=2)
         abb.send(rrc.MoveToJoints(joints, axis, speed, rrc.Zone.FINE))
-
-
-def _from_move_to_plan(rob_num, robot_pos, config):
-    """Taking a robot position in (deg & mm) and turning it into Configuration (rad & m)"""
-
-    robot_joints, external_axes = robot_pos
-
-    robot_joints = to_radians(robot_joints.values)  # in radians
-    external_axes = external_axes[0] / 1000  # in m
-
-    if rob_num == "/rob1":
-        config["r1_cart_joint"] = external_axes
-        config["r1_joint_1"] = robot_joints[0]
-        config["r1_joint_2"] = robot_joints[1]
-        config["r1_joint_3"] = robot_joints[2]
-        config["r1_joint_4"] = robot_joints[3]
-        config["r1_joint_5"] = robot_joints[4]
-        config["r1_joint_6"] = robot_joints[5]
-    elif rob_num == "/rob2":
-        config["r2_cart_joint"] = external_axes
-        config["r2_joint_1"] = robot_joints[0]
-        config["r2_joint_2"] = robot_joints[1]
-        config["r2_joint_3"] = robot_joints[2]
-        config["r2_joint_4"] = robot_joints[3]
-        config["r2_joint_5"] = robot_joints[4]
-        config["r2_joint_6"] = robot_joints[5]
-
-    return config
-
-
-def _from_plan_to_move(rob_num, config):
-    """Taking a config in (rad & m) and turning it into JointAxes (deg) and ExternalAxes (mm)"""
-
-    scale = 1000
-
-    if rob_num == "/rob1":
-        axis = rrc.ExternalAxes(config["r1_cart_joint"] * scale)
-        joints = rrc.RobotJoints(
-            math.degrees(config["r1_joint_1"]),
-            math.degrees(config["r1_joint_2"]),
-            math.degrees(config["r1_joint_3"]),
-            math.degrees(config["r1_joint_4"]),
-            math.degrees(config["r1_joint_5"]),
-            math.degrees(config["r1_joint_6"]),
-        )
-    elif rob_num == "/rob2":
-        axis = rrc.ExternalAxes(config["r2_cart_joint"] * scale)
-        joints = rrc.RobotJoints(
-            math.degrees(config["r2_joint_1"]),
-            math.degrees(config["r2_joint_2"]),
-            math.degrees(config["r2_joint_3"]),
-            math.degrees(config["r2_joint_4"]),
-            math.degrees(config["r2_joint_5"]),
-            math.degrees(config["r2_joint_6"]),
-        )
-
-    return joints, axis
-
-
-def _get_current_joints_axis(abb):
-    # return list of joint and track values
-    return abb.send_and_wait(rrc.GetJoints(), timeout=10)
-
-
-def _get_current_configuration(abb, rob_num, robot):
-    """gets the current configuration"""
-    robot_pos = _get_current_joints_axis(abb)
-
-    # --config to for use in path planning (rad & m)-- #
-    return _from_move_to_plan(rob_num, robot_pos, robot.zero_configuration())
-
-
-def _scale_frame(f, scale):
-    f.point.x *= scale
-    f.point.y *= scale
-    f.point.z *= scale
-
-    return f
-
-
-def plan_to_frame(abb, rob_num, robot, planning_group, f, speed):
-    """plan inverse kinematic from current frame to specified frame"""
-
-    # --current configuration --#
-    start_config = _get_current_configuration(abb, rob_num, robot)
-    # print('--start config:', start_config)
-
-    end_config = robot.inverse_kinematics(f, start_config, group=planning_group)
-    # print('--end_config:', end_config)
-
-    joints, axis = _from_plan_to_move(rob_num, end_config)
-
-    abb.send(rrc.PrintText("moving to {}".format(joints)))
-    abb.send_and_wait(rrc.Stop(feedback_level=rrc.FeedbackLevel.DONE))
-
-    abb.send_and_wait(rrc.MoveToJoints(joints, axis, speed, rrc.Zone.FINE))
-
-
-def move_to_frame(abb, f, ext, speed):
-    abb.send(rrc.PrintText("press play to move to next frame..."))
-    abb.send_and_wait(rrc.Stop(feedback_level=rrc.FeedbackLevel.DONE))
-
-    f = _scale_frame(f, 1000)
-
-    abb.send_and_wait(rrc.MoveToRobtarget(f, ext, speed, rrc.Zone.FINE))
 
 
 if __name__ == "__main__":
@@ -221,3 +98,5 @@ if __name__ == "__main__":
     for abb, rob_num, config in zip(abbs, rob_nums, configs):
         configs_to_move(abb, rob_num, config)
         print("move, ", rob_num)  # slow down sending code, avoid block
+
+    # robot_config_saving(rob_nums, i=0, n_config=99)

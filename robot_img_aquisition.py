@@ -5,7 +5,7 @@ import compas_rrc as rrc
 
 # LOCAL IMPORTS
 from src.RRC_CONNECT import connect_to_robots
-from src.robot_commands import configs_to_move
+from src.robot_commands import configs_to_move, get_current_config
 from src.io import save_config_json, save_frames_as_matrix_yaml, load_config_json, _create_file_path
 
 from src_cam.camera.use import (
@@ -18,27 +18,9 @@ from src_cam.utility.io import load_pointcloud
 from src_cam.camera.convert import convert2png
 
 
-def _get_current_config(robot, abb, rob_num):
-
-    config = robot.zero_configuration()
-
-    if rob_num in [1, 2]:
-        current_joints, current_track = abb.send_and_wait(rrc.GetJoints(), timeout=3)
-        config["r{}_cart_joint".format(rob_num)] = current_track[0]
-    elif rob_num in [3]:
-        current_joints = abb.send_and_wait(rrc.GetJoints(), timeout=3)
-
-    config["r{}_joint_1".format(rob_num)] = current_joints[0]
-    config["r{}_joint_2".format(rob_num)] = current_joints[1]
-    config["r{}_joint_3".format(rob_num)] = current_joints[2]
-    config["r{}_joint_4".format(rob_num)] = current_joints[3]
-    config["r{}_joint_5".format(rob_num)] = current_joints[4]
-    config["r{}_joint_6".format(rob_num)] = current_joints[5]
-
-    return config
-
-
 def _generate_range(folder, pose_range=False):
+    """count how many config files live in folder"""
+
     if not pose_range:
         a = _create_file_path(folder, "")
         num_files = len(glob.glob(a.__str__() + "/*"))
@@ -46,6 +28,17 @@ def _generate_range(folder, pose_range=False):
         pose_range = range(1, num_files)
 
     return pose_range
+
+
+def _save_multi_configs(rob_nums, abbs, robots, folder, filename):
+    for abb, robot, rob_num in zip(abbs, robots, rob_nums):
+        config = get_current_config(robot, abb, rob_num)
+
+        save_config_json(
+            config,
+            folder=folder.format(rob_num),
+            output_file=filename,
+        )
 
 
 def robot_camera_aquisition(abbs, rob_nums, pose_range, folders, filenames):
@@ -116,67 +109,54 @@ def robot_camera_aquisition(abbs, rob_nums, pose_range, folders, filenames):
     print("AQUISITIONS DONE")
 
 
-def calibration(rob_nums, pose_range=False):
+def calibration(rob_nums, save_config_n=False, pose_range=False):
     folders = ["configs/calibration/R{}", "data/calibration/R{}"]
     filenames = ["calibration_config_{0:0{width}}.json", "pos{:02d}.yaml", "img{:02d}"]
 
-    abbs, _ = connect_to_robots(rob_nums)
-    pose_range = _generate_range(folders[0].format(rob_nums[0]), pose_range)
+    abbs, robots = connect_to_robots(rob_nums)
 
-    robot_camera_aquisition(abbs, rob_nums, pose_range, folders, filenames)
+    if save_config_n:
+        _save_multi_configs(
+            rob_nums, abbs, robots, folders[0], filenames[0].format(save_config_n, width=3)
+        )
+    else:
+        pose_range = _generate_range(folders[0].format(rob_nums[0]), pose_range)
+        robot_camera_aquisition(abbs, rob_nums, pose_range, folders, filenames)
 
 
-def stitching(rob_nums, pose_range=False):
+def stitching(rob_nums, save_config_n=False, pose_range=False):
     folders = ["configs/stitch/R{}", "data/stitch/R{}"]
     filenames = ["stitch_config_{0:0{width}}.json", "pos{:02d}.yaml", "img{:02d}"]
 
-    abbs, _ = connect_to_robots(rob_nums)
-    pose_range = _generate_range(folders[0].format(rob_nums[0]), pose_range)
+    abbs, robots = connect_to_robots(rob_nums)
 
-    robot_camera_aquisition(abbs, rob_nums, pose_range, folders, filenames)
+    if save_config_n:
+        _save_multi_configs(
+            rob_nums, abbs, robots, folders[0], filenames[0].format(save_config_n, width=3)
+        )
+    else:
+        pose_range = _generate_range(folders[0].format(rob_nums[0]), pose_range)
+        robot_camera_aquisition(abbs, rob_nums, pose_range, folders, filenames)
 
 
-def stitching_shed(rob_nums, pose_range=False):
+def stitching_shed(rob_nums, save_config_n=False, pose_range=False):
     folders = ["configs/stitch_shed/R{}", "data/stitch_shed/R{}"]
     filenames = ["stitch_shed_{0:0{width}}.json", "pos{:02d}.yaml", "img{:02d}"]
 
-    abbs, _ = connect_to_robots(rob_nums)
-    pose_range = _generate_range(folders[0].format(rob_nums[0]), pose_range)
-
-    robot_camera_aquisition(abbs, rob_nums, pose_range, folders, filenames)
-
-
-def robot_config_saving(rob_nums, i, n_config):
-    folders = [
-        "configs/calibration/R{}",
-        "configs/stitch/R{}",
-        "configs/_test/R{}",
-        "configs/stitch_shed/R{}",
-    ]
-    filenames = [
-        "calibration_config_{0:0{width}}.json",
-        "stitch_config_{0:0{width}}.json",
-        "test_config_{0:0{width}}.json",
-        "stitch_shed_{0:0{width}}.json",
-    ]
-
     abbs, robots = connect_to_robots(rob_nums)
 
-    for abb, robot, rob_num in zip(abbs, robots, rob_nums):
-        config = _get_current_config(robot, abb, rob_num)
-
-        save_config_json(
-            config,
-            folder=folders[i].format(rob_num),
-            output_file=filenames[i].format(n_config, width=3),
+    if save_config_n:
+        _save_multi_configs(
+            rob_nums, abbs, robots, folders[0], filenames[0].format(save_config_n, width=3)
         )
+    else:
+        pose_range = _generate_range(folders[0].format(rob_nums[0]), pose_range)
+        robot_camera_aquisition(abbs, rob_nums, pose_range, folders, filenames)
 
 
 if __name__ == "__main__":
-
     rob_nums = [1, 2]
-    # robot_config_saving(rob_nums, i=3, n_config=99)
 
-    # calibration(rob_nums, pose_range=False)
-    stitching(rob_nums, pose_range=False)
-    # stitching_shed(rob_nums, pose_range=range(61, 62))
+    calibration(rob_nums, save_config_n=999, pose_range=False)
+    # stitching(rob_nums, save_config_n=999, pose_range=False)
+    # stitching_shed(rob_nums, save_config_n=999, pose_range=range(61, 62))

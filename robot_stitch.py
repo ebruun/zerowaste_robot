@@ -2,12 +2,9 @@ import open3d as o3d
 import numpy as np
 
 # COMPAS IMPORTS
-import compas_rrc as rrc
 from compas.geometry import Transformation
 
 # LOCAL IMPORTS
-from src.RRC_CONNECT import connect_to_robot
-from src.robot_commands import configs_to_move
 from src.io import load_as_transformation_yaml, _create_file_path, load_o3d_view_settings
 
 from src_cam.utility.io import load_pointcloud
