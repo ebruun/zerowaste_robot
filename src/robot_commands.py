@@ -98,5 +98,3 @@ if __name__ == "__main__":
     for abb, rob_num, config in zip(abbs, rob_nums, configs):
         configs_to_move(abb, rob_num, config)
         print("move, ", rob_num)  # slow down sending code, avoid block
-
-    # robot_config_saving(rob_nums, i=0, n_config=99)

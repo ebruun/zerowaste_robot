@@ -6,7 +6,12 @@ import compas_rrc as rrc
 # LOCAL IMPORTS
 from src.RRC_CONNECT import connect_to_robots
 from src.robot_commands import configs_to_move, get_current_config
-from src.io import save_config_json, save_frames_as_matrix_yaml, load_config_json, _create_file_path
+from src.io import (
+    save_config_json,
+    save_frames_as_matrix_yaml,
+    load_config_json,
+    _create_file_path,
+)
 
 from src_cam.camera.use import (
     camera_connect,
@@ -155,8 +160,10 @@ def stitching_shed(rob_nums, save_config_n=False, pose_range=False):
 
 
 if __name__ == "__main__":
-    rob_nums = [1, 2]
+    rob_nums = [2]
 
-    calibration(rob_nums, save_config_n=999, pose_range=False)
+    # UPDATE to "save_config_n" to FALSE for execution
+
+    calibration(rob_nums, save_config_n=False, pose_range=range(21, 22))
     # stitching(rob_nums, save_config_n=999, pose_range=False)
     # stitching_shed(rob_nums, save_config_n=999, pose_range=range(61, 62))

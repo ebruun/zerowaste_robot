@@ -54,6 +54,16 @@ def save_frames_as_matrix_yaml(frames, folder, output_file):
     s.release()
 
 
+def save_transformation_as_matrix_yaml(transformation, folder, output_file):
+    file_path = _create_file_path(folder, output_file)
+    s = cv.FileStorage(file_path.__str__(), cv.FileStorage_WRITE)
+
+    PoseState = np.array(transformation)
+    s.write("PoseState", PoseState)
+
+    s.release()
+
+
 # Create wobj to world 0 transform (hard-coded values from robot studio)
 def save_wobj_as_matrix_yaml(rob_num, folder, output_file):
 
