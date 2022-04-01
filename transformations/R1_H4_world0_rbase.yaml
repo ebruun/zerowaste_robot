@@ -1,6 +1,6 @@
 %YAML:1.0
 ---
-PoseState: !!opencv-matrix
+PoseState0: !!opencv-matrix
    rows: 4
    cols: 4
    dt: d

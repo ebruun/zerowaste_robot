@@ -44,10 +44,10 @@ def _transform_pickup_frames(abbs, rob_nums, folders, filenames):
         # what camera sees
         F_objects = load_as_frames_yaml(folder=folders[0], name=filenames[0].format(rob_num))
 
-        # transformation matrix between camera and tool0
+        # transformation matrix between TOOL0 and CAMERA
         T2 = load_as_transformation_yaml(folder=folders[0], name=filenames[1].format(rob_num))
 
-        # transformation matrix between tool0 and robot base
+        # transformation matrix between ROBOT BASE (WOBJ) and TOOL0
         T3 = load_as_transformation_yaml(folder=folders[0], name=filenames[2].format(rob_num))
 
         T = Transformation.concatenated(T3, T2)

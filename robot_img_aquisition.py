@@ -130,7 +130,7 @@ def aquisition_calibration(rob_nums, save_config_n=False, pose_range=False):
         _robot_camera_aquisition(abbs, rob_nums, pose_range, folders, filenames)
 
 
-def aquisition_stitching_ECL_demo(rob_nums, save_config_n=False, pose_range=False):
+def aquisition_ECL_demo(rob_nums, save_config_n=False, pose_range=False):
     folders = ["configs/stitch_ECL_demo/R{}", "data/stitch_ECL_demo/R{}"]
     filenames = ["stitch_demo_config_{0:0{width}}.json", "pos{:02d}.yaml", "img{:02d}"]
 
@@ -145,7 +145,7 @@ def aquisition_stitching_ECL_demo(rob_nums, save_config_n=False, pose_range=Fals
         _robot_camera_aquisition(abbs, rob_nums, pose_range, folders, filenames)
 
 
-def aquisition_stitching_shed(rob_nums, save_config_n=False, pose_range=False):
+def aquisition_shed(rob_nums, save_config_n=False, pose_range=False):
     folders = ["configs/stitch_shed/R{}", "data/stitch_shed/R{}"]
     filenames = ["stitch_shed_{0:0{width}}.json", "pos{:02d}.yaml", "img{:02d}"]
 
@@ -166,5 +166,5 @@ if __name__ == "__main__":
     # set "save_config_n" to FALSE to execute aquisition
 
     # aquisition_calibration(rob_nums, save_config_n=999, pose_range=range(21, 22))
-    aquisition_stitching_ECL_demo(rob_nums, save_config_n=False, pose_range=False)
-    # aquisition_stitching_shed(rob_nums, save_config_n=999, pose_range=range(61, 62))
+    aquisition_ECL_demo(rob_nums, save_config_n=False, pose_range=False)
+    # aquisition_shed(rob_nums, save_config_n=999, pose_range=range(61, 62))

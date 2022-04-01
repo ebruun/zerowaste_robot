@@ -24,13 +24,13 @@ def _transform_pointclouds(rob_nums, pose_range, folders, filenames):
                 input_file=filenames[0].format(i, width=3),
             )
 
-            # transformation matrix between camera and tool0
+            # transformation matrix between TOOL0 and CAMERA
             T2 = load_as_transformation_yaml(folders[2], filenames[1].format(rob_num))
 
-            # transformation matrix between tool0 and robot base
+            # transformation matrix between ROBOT BASE (WOBJ) and TOOL0
             T3 = load_as_transformation_yaml(folders[0].format(rob_num), filenames[3].format(i))
 
-            # transformation matrix between robot base and world0
+            # transformation matrix between WORLD0 and ROBOT BASE (WOBJ)
             T4 = load_as_transformation_yaml(folders[2], filenames[2].format(rob_num))
 
             T = Transformation.concatenated(T4, Transformation.concatenated(T3, T2))
@@ -168,13 +168,21 @@ def stitch_full(vis_on=False):
     )
 
 
+def stitch_shed():
+    pass
+
+
+def stitch_ECL_demo():
+    pass
+
+
 if __name__ == "__main__":
 
     folders = ["data/stitch_shed/R{}", "data/stitch_shed", "transformations"]
     filenames = [
         "img{:02d}.zdf",
-        "R{}_H2_robot_cam.yaml",
-        "R{}_H4_world_wobj.yaml",
+        "R{}_H2_tool0_cam.yaml",
+        "R{}_H4_world0_rbase.yaml",
         "pos{:02d}.yaml",
         "img{:02d}_trns.ply",
         "img_notrans{:02d}.ply",
@@ -184,12 +192,9 @@ if __name__ == "__main__":
     ]
 
     rob_nums = [1, 2]
-    # _transform_pointclouds(
-    #     rob_nums=rob_nums,
-    #     pose_range=range(60, 100),
-    #     folders=folders,
-    #     filenames=filenames
-    # )
+    _transform_pointclouds(
+        rob_nums=rob_nums, pose_range=range(90, 100), folders=folders, filenames=filenames
+    )
 
     # stitch_separate_robots(
     #     rob_nums=rob_nums,
@@ -197,4 +202,4 @@ if __name__ == "__main__":
     #     vis_on=False,
     # )
 
-    stitch_full(vis_on=True)
+    # stitch_full(vis_on=True)
