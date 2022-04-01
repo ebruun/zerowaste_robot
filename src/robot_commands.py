@@ -1,5 +1,6 @@
 # PYTHON IMPORTS
 import math
+import time
 
 # COMPAS IMPORTS
 import compas_rrc as rrc
@@ -29,11 +30,19 @@ def get_current_config(robot, abb, rob_num):
     return config
 
 
-def configs_to_move(abb, rob_num, configs):
+def frame_to_move(abb, frame, speed=100):
+    """Taking a frame and move the robot to it"""
+
+    abb.send(rrc.PrintText("Moving to specified frame..."))
+
+    abb.send(rrc.MoveToFrame(frame, speed, rrc.Zone.FINE, rrc.Motion.LINEAR))
+    time.sleep(0.2)
+
+
+def configs_to_move(abb, rob_num, configs, speed=100):
     """Taking a list of robot configs in (deg & mm) and move the robot to them"""
 
     abb.send(rrc.PrintText("Moving to specified configs..."))
-    speed = 100
 
     for config in configs:
         if rob_num == 1:
@@ -71,6 +80,7 @@ def configs_to_move(abb, rob_num, configs):
         # abb.send(rrc.PrintText("MOVE TO CONFIG DONE"))
 
         abb.send(rrc.MoveToJoints(joints, axis, speed, rrc.Zone.FINE))
+        time.sleep(0.2)
 
 
 if __name__ == "__main__":
@@ -81,6 +91,7 @@ if __name__ == "__main__":
         "ECL_park_high",
         "ECL_park_mid",
         "ECL_park_low",
+        "ECL_demo",
     ]
 
     abbs, _ = connect_to_robots(rob_nums)
@@ -91,10 +102,9 @@ if __name__ == "__main__":
         configs.append(
             load_config_json(
                 "configs/presets/R{}".format(rob_num),
-                preset_name[0] + ".json",
+                preset_name[5] + ".json",
             )
         )
 
     for abb, rob_num, config in zip(abbs, rob_nums, configs):
         configs_to_move(abb, rob_num, config)
-        print("move, ", rob_num)  # slow down sending code, avoid block

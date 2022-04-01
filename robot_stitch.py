@@ -24,13 +24,13 @@ def _transform_pointclouds(rob_nums, pose_range, folders, filenames):
                 input_file=filenames[0].format(i, width=3),
             )
 
-            # transformation matrix between robot and camera
+            # transformation matrix between camera and tool0
             T2 = load_as_transformation_yaml(folders[2], filenames[1].format(rob_num))
 
-            # transformation matrix between robot and wobj (tool0 frame)
+            # transformation matrix between tool0 and robot base
             T3 = load_as_transformation_yaml(folders[0].format(rob_num), filenames[3].format(i))
 
-            # transformation matrix between wobj and world-0
+            # transformation matrix between robot base and world0
             T4 = load_as_transformation_yaml(folders[2], filenames[2].format(rob_num))
 
             T = Transformation.concatenated(T4, Transformation.concatenated(T3, T2))

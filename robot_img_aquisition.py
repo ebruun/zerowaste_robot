@@ -30,12 +30,13 @@ def _generate_range(folder, pose_range=False):
         a = _create_file_path(folder, "")
         num_files = len(glob.glob(a.__str__() + "/*"))
 
-        pose_range = range(1, num_files)
+        pose_range = range(1, num_files + 1)
 
     return pose_range
 
 
 def _save_multi_configs(rob_nums, abbs, robots, folder, filename):
+    """save a config for multiple robots"""
     for abb, robot, rob_num in zip(abbs, robots, rob_nums):
         config = get_current_config(robot, abb, rob_num)
 
@@ -46,7 +47,7 @@ def _save_multi_configs(rob_nums, abbs, robots, folder, filename):
         )
 
 
-def robot_camera_aquisition(abbs, rob_nums, pose_range, folders, filenames):
+def _robot_camera_aquisition(abbs, rob_nums, pose_range, folders, filenames):
     print("START AQUISITION PROCESS")
 
     for i in pose_range:
@@ -114,7 +115,7 @@ def robot_camera_aquisition(abbs, rob_nums, pose_range, folders, filenames):
     print("AQUISITIONS DONE")
 
 
-def calibration(rob_nums, save_config_n=False, pose_range=False):
+def aquisition_calibration(rob_nums, save_config_n=False, pose_range=False):
     folders = ["configs/calibration/R{}", "data/calibration/R{}"]
     filenames = ["calibration_config_{0:0{width}}.json", "pos{:02d}.yaml", "img{:02d}"]
 
@@ -126,12 +127,12 @@ def calibration(rob_nums, save_config_n=False, pose_range=False):
         )
     else:
         pose_range = _generate_range(folders[0].format(rob_nums[0]), pose_range)
-        robot_camera_aquisition(abbs, rob_nums, pose_range, folders, filenames)
+        _robot_camera_aquisition(abbs, rob_nums, pose_range, folders, filenames)
 
 
-def stitching(rob_nums, save_config_n=False, pose_range=False):
-    folders = ["configs/stitch/R{}", "data/stitch/R{}"]
-    filenames = ["stitch_config_{0:0{width}}.json", "pos{:02d}.yaml", "img{:02d}"]
+def aquisition_stitching_ECL_demo(rob_nums, save_config_n=False, pose_range=False):
+    folders = ["configs/stitch_ECL_demo/R{}", "data/stitch_ECL_demo/R{}"]
+    filenames = ["stitch_demo_config_{0:0{width}}.json", "pos{:02d}.yaml", "img{:02d}"]
 
     abbs, robots = connect_to_robots(rob_nums)
 
@@ -141,10 +142,10 @@ def stitching(rob_nums, save_config_n=False, pose_range=False):
         )
     else:
         pose_range = _generate_range(folders[0].format(rob_nums[0]), pose_range)
-        robot_camera_aquisition(abbs, rob_nums, pose_range, folders, filenames)
+        _robot_camera_aquisition(abbs, rob_nums, pose_range, folders, filenames)
 
 
-def stitching_shed(rob_nums, save_config_n=False, pose_range=False):
+def aquisition_stitching_shed(rob_nums, save_config_n=False, pose_range=False):
     folders = ["configs/stitch_shed/R{}", "data/stitch_shed/R{}"]
     filenames = ["stitch_shed_{0:0{width}}.json", "pos{:02d}.yaml", "img{:02d}"]
 
@@ -156,14 +157,14 @@ def stitching_shed(rob_nums, save_config_n=False, pose_range=False):
         )
     else:
         pose_range = _generate_range(folders[0].format(rob_nums[0]), pose_range)
-        robot_camera_aquisition(abbs, rob_nums, pose_range, folders, filenames)
+        _robot_camera_aquisition(abbs, rob_nums, pose_range, folders, filenames)
 
 
 if __name__ == "__main__":
-    rob_nums = [2]
+    rob_nums = [1, 2]
 
-    # UPDATE to "save_config_n" to FALSE for execution
+    # set "save_config_n" to FALSE to execute aquisition
 
-    calibration(rob_nums, save_config_n=False, pose_range=range(21, 22))
-    # stitching(rob_nums, save_config_n=999, pose_range=False)
-    # stitching_shed(rob_nums, save_config_n=999, pose_range=range(61, 62))
+    # aquisition_calibration(rob_nums, save_config_n=999, pose_range=range(21, 22))
+    aquisition_stitching_ECL_demo(rob_nums, save_config_n=False, pose_range=False)
+    # aquisition_stitching_shed(rob_nums, save_config_n=999, pose_range=range(61, 62))

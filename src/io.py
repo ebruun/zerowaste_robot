@@ -29,6 +29,7 @@ def _create_file_path(folder, filename, rob_num=None, i=None):
 
 # -- SAVING DATA FUNCTIONS --#
 def save_config_json(config, folder, output_file):
+    """save a config for a single robot"""
     filepath = _create_file_path(folder, output_file)
 
     c = config.to_data()
@@ -44,7 +45,7 @@ def save_frames_as_matrix_yaml(frames, folder, output_file):
     if len(frames) == 1:
         T = Transformation.from_frame(frames[0])
         PoseState = np.array(T)
-        s.write("PoseState", PoseState)
+        s.write("PoseState0", PoseState)
     else:
         for i, f in enumerate(frames):
             T = Transformation.from_frame(f)
@@ -59,13 +60,13 @@ def save_transformation_as_matrix_yaml(transformation, folder, output_file):
     s = cv.FileStorage(file_path.__str__(), cv.FileStorage_WRITE)
 
     PoseState = np.array(transformation)
-    s.write("PoseState", PoseState)
+    s.write("PoseState0", PoseState)
 
     s.release()
 
 
-# Create wobj to world 0 transform (hard-coded values from robot studio)
 def save_wobj_as_matrix_yaml(rob_num, folder, output_file):
+    """Create wobj to world 0 transform (hard-coded values from robot studio)"""
 
     if rob_num == 1:
         q1 = [0.999971, 0.000727707, -0.00129108, -0.00745658]
@@ -113,6 +114,7 @@ def load_as_frames_yaml(folder, name):
                 i += 1
 
         except TypeError:
+            print("error in reading frame from .yaml")
             s.release()
             reading = False
 
@@ -130,7 +132,7 @@ def load_as_transformation_yaml(folder, name):
     file_name = _create_file_path(folder, name)
     s = cv.FileStorage(file_name.__str__(), cv.FILE_STORAGE_READ)
 
-    h = s.getNode("PoseState").mat()
+    h = s.getNode("PoseState0").mat()
 
     s.release()
 
@@ -152,7 +154,7 @@ if __name__ == "__main__":
     # _create_file_path("calibration_data{}", "pos.yaml", rob_num=2)
 
     rob_num = 2
-    # save_wobj_as_matrix_yaml(rob_num,"transformations","R{}_H4_world_wobj.yaml".format(rob_num))
+    # save_wobj_as_matrix_yaml(rob_num,"transformations","R{}_H4_world0_rbase.yaml".format(rob_num))
 
     # folder = "data/stitch_shed"
     # name = "_o3d_view_settings_R{}.json".format(rob_num)
