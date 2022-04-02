@@ -3,6 +3,7 @@ import cv2 as cv
 import numpy as np
 import pathlib
 import json
+import glob
 
 # COMPAS IMPORTS
 from compas.geometry import Transformation, Frame, allclose
@@ -25,6 +26,18 @@ def _create_file_path(folder, filename, rob_num=None, i=None):
 
     print("--created file path: ", path)
     return path
+
+
+def _generate_range(folder, pose_range=False):
+    """count how many config files live in folder"""
+
+    if not pose_range:
+        a = _create_file_path(folder, "")
+        num_files = len(glob.glob(a.__str__() + "/*"))
+
+        pose_range = range(1, num_files + 1)
+
+    return pose_range
 
 
 # -- SAVING DATA FUNCTIONS --#

@@ -1,3 +1,6 @@
+# PYTHON IMPORTS
+import time
+
 # COMPAS IMPORTS
 import compas_rrc as rrc
 from compas.geometry import Transformation
@@ -13,9 +16,24 @@ from src.io import (
 )
 
 
-# function to offset a frame in the z-direction
-# this is because the TCP
+def _io_gripper(abb, i):
+
+    name = abb._server_protocol_check["param"].name
+
+    rob_num = int(name.split("/")[1][-1])
+
+    if i:
+        print("close gripper")
+        abb.send(rrc.SetDigital("do_{}".format(rob_num), i))
+    else:
+        print("open gripper")
+        abb.send(rrc.SetDigital("do_{}".format(rob_num), i))
+
+    time.sleep(0.2)
+
+
 def _offset_frame(f, offset):
+    """offset a frame in the z-direction"""
 
     z_axis = f.zaxis
     t = Translation.from_vector(z_axis * offset)
@@ -24,6 +42,10 @@ def _offset_frame(f, offset):
 
 
 def _transform_pickup_frames(abbs, rob_nums, folders, filenames):
+    """
+    tranform member pickup frames seen by camera to robot coordinate system
+    returns two frames: far from member, on member
+    """
 
     F = []
     R = []
@@ -82,8 +104,20 @@ def pick_ECL_demo(abbs, rob_nums):
     for abb, f in zip(R, [item[1] for item in F]):
         frame_to_move(abb, f, speed=30)
 
+    abbs[0].send(rrc.PrintText("PRESS PLAY to close gripper"))
+    abbs[0].send_and_wait(rrc.Stop(feedback_level=rrc.FeedbackLevel.DONE), timeout=20)
+
+    for abb in abbs:
+        _io_gripper(abb, 1)
+
+    abbs[0].send(rrc.PrintText("PRESS PLAY to open gripper"))
+    abbs[0].send_and_wait(rrc.Stop(feedback_level=rrc.FeedbackLevel.DONE), timeout=20)
+
+    for abb in abbs:
+        _io_gripper(abb, 0)
+
 
 if __name__ == "__main__":
-    rob_nums = [1]
-    abbs, _ = connect_to_robots(rob_nums)
+    rob_nums = [1, 2]
+    abbs, robots = connect_to_robots(rob_nums)
     pick_ECL_demo(abbs, rob_nums)

@@ -4,33 +4,34 @@ import compas_rrc as rrc
 
 # Connect to robot
 def _connect_to_single_robot(rob_num):
+    """connect to a single robot"""
 
     ros = rrc.RosClient()
     ros.run()
     robot = ros.load_robot()
 
     abb = rrc.AbbClient(ros, "/rob" + str(rob_num))
-    abb.send(
-        rrc.PrintText("CONNECTED TO {}, press play to continue...".format("/rob" + str(rob_num)))
-    )
-    abb.send_and_wait(rrc.Stop(feedback_level=rrc.FeedbackLevel.DONE))
 
     if rob_num == 1:
         abb.send(rrc.SetWorkObject("rob1_acadia_EBIT_01"))
         abb.send(rrc.SetTool("ecl_pneumatic_gripper"))
+        # abb.send(rrc.SetMaxSpeed(override=100, max_tcp=10000))
         # abb.send(rrc.SetWorkObject('ECL_platform'))
         # abb.send(rrc.SetWorkObject('wobj0'))
     elif rob_num == 2:
         abb.send(rrc.SetWorkObject("rob2_acadia_EBIT_01"))
         abb.send(rrc.SetTool("ecl_pneumatic_gripper"))
+        # abb.send(rrc.SetMaxSpeed(override=100, max_tcp=10000))
         # abb.send(rrc.SetWorkObject('ECL_platform'))
         # abb.send(rrc.SetWorkObject('wobj0'))
 
-    abb.send(rrc.PrintText("Starting..."))
+    abb.send(rrc.PrintText("CONNECTED TO {}, press play to cont...".format("/rob" + str(rob_num))))
+    abb.send_and_wait(rrc.Stop(feedback_level=rrc.FeedbackLevel.DONE))
     return robot, abb
 
 
 def _connect_to_multiple_robot(rob_nums):
+    "connect to to multiple robots"
     robots = []
     abbs = []
     for rob_num in rob_nums:

@@ -1,17 +1,10 @@
-import glob
-
 # COMPAS IMPORTS
 import compas_rrc as rrc
 
 # LOCAL IMPORTS
 from src.RRC_CONNECT import connect_to_robots
 from src.robot_commands import configs_to_move, get_current_config
-from src.io import (
-    save_config_json,
-    save_frames_as_matrix_yaml,
-    load_config_json,
-    _create_file_path,
-)
+from src.io import save_config_json, save_frames_as_matrix_yaml, load_config_json, _generate_range
 
 from src_cam.camera.use import (
     camera_connect,
@@ -21,18 +14,6 @@ from src_cam.camera.use import (
 
 from src_cam.utility.io import load_pointcloud
 from src_cam.camera.convert import convert2png
-
-
-def _generate_range(folder, pose_range=False):
-    """count how many config files live in folder"""
-
-    if not pose_range:
-        a = _create_file_path(folder, "")
-        num_files = len(glob.glob(a.__str__() + "/*"))
-
-        pose_range = range(1, num_files + 1)
-
-    return pose_range
 
 
 def _save_multi_configs(rob_nums, abbs, robots, folder, filename):
@@ -166,5 +147,5 @@ if __name__ == "__main__":
     # set "save_config_n" to FALSE to execute aquisition
 
     # aquisition_calibration(rob_nums, save_config_n=999, pose_range=range(21, 22))
-    aquisition_ECL_demo(rob_nums, save_config_n=False, pose_range=False)
+    aquisition_ECL_demo(rob_nums, save_config_n=False, pose_range=range(1, 5))
     # aquisition_shed(rob_nums, save_config_n=999, pose_range=range(61, 62))
