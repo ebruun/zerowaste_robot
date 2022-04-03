@@ -4,4 +4,8 @@
 /data/stitch/R2/*
 /data/stitch_shed/R1/*
 /data/stitch_shed/R2/*
+data/stitch_ECL_demo/R1/*
+data/stitch_ECL_demo/R2/*
+!data/stitch_ECL_demo/R1/*.json
+!data/stitch_ECL_demo/R2/*.json
 /configs/_test

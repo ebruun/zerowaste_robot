@@ -63,7 +63,7 @@ def _visualize_pcd(pcd, folder, filename):
 
 def _stitch_pcd(rob_nums, pc_range, folders, filenames, vis_on=False):
     pcd_vars = {
-        "voxels": 1,
+        "voxels": 10,
         "neighbors": 20,
         "std_dev": 0.1,
         "scale": 1000,
@@ -112,13 +112,6 @@ def _stitch_pcd(rob_nums, pc_range, folders, filenames, vis_on=False):
 
 
 def _stitch_full(folders, filenames, vis_on=False):
-    # folders = ["data/stitch_shed/R{}", "data/stitch_shed"]
-    # filenames = [
-    #     "_R{}_pcd_stitched.pts",
-    #     "pcd_full.pts",
-    #     "_o3d_view_settings_full.json",
-    # ]
-
     pcd_vars = {
         "voxels": 0.004,
         "neighbors": 5,

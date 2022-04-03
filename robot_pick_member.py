@@ -52,7 +52,7 @@ def _transform_pickup_frames(abbs, rob_nums, folders, filenames):
 
     for abb, rob_num in zip(abbs, rob_nums):
 
-        abb.send(rrc.PrintText("PRESS PLAY to start member pickup process..."))
+        abb.send(rrc.PrintText("PRESS PLAY to start pickup process..."))
         abb.send_and_wait(rrc.Stop(feedback_level=rrc.FeedbackLevel.DONE))
 
         f = [abb.send_and_wait(rrc.GetFrame(), timeout=3)]
@@ -60,7 +60,7 @@ def _transform_pickup_frames(abbs, rob_nums, folders, filenames):
             frames=f, folder=folders[0], output_file=filenames[2].format(rob_num)
         )
 
-        abb.send(rrc.PrintText("PRESS PLAY to read in transformation matrices..."))
+        abb.send(rrc.PrintText("PRESS PLAY to transform matrices..."))
         abb.send_and_wait(rrc.Stop(feedback_level=rrc.FeedbackLevel.DONE))
 
         # what camera sees
@@ -109,6 +109,12 @@ def pick_ECL_demo(abbs, rob_nums):
 
     for abb in abbs:
         _io_gripper(abb, 1)
+
+    abbs[0].send(rrc.PrintText("PRESS PLAY to move to member offset location"))
+    abbs[0].send_and_wait(rrc.Stop(feedback_level=rrc.FeedbackLevel.DONE), timeout=20)
+
+    for abb, f in zip(R, [item[0] for item in F]):
+        frame_to_move(abb, f)
 
     abbs[0].send(rrc.PrintText("PRESS PLAY to open gripper"))
     abbs[0].send_and_wait(rrc.Stop(feedback_level=rrc.FeedbackLevel.DONE), timeout=20)
