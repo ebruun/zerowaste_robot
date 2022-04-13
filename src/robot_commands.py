@@ -13,12 +13,10 @@ from src.io import load_config_json
 def get_current_config(robot, abb, rob_num):
 
     config = robot.zero_configuration()
+    current_joints, current_track = abb.send_and_wait(rrc.GetJoints(), timeout=3)
 
-    if rob_num in [1, 2]:
-        current_joints, current_track = abb.send_and_wait(rrc.GetJoints(), timeout=3)
+    if rob_num in [1, 2]:  # only R1 and R2 have an external axis
         config["r{}_cart_joint".format(rob_num)] = current_track[0]
-    elif rob_num in [3]:
-        current_joints = abb.send_and_wait(rrc.GetJoints(), timeout=3)
 
     config["r{}_joint_1".format(rob_num)] = current_joints[0]
     config["r{}_joint_2".format(rob_num)] = current_joints[1]

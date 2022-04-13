@@ -3,5 +3,7 @@ data/*/*/*.yaml
 data/*/*/*.ply
 
 data/*/*/_imgs/*
+!data/_wobj/
+!data/_wobj/*/*.yaml
 
 configs/_test
