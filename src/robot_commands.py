@@ -82,7 +82,7 @@ def configs_to_move(abb, rob_num, configs, speed=100):
 
 
 if __name__ == "__main__":
-    rob_nums = [1, 2]
+    rob_nums = [1]
     preset_name = [
         "camera_attach",
         "zero_position",
@@ -90,6 +90,7 @@ if __name__ == "__main__":
         "ECL_park_mid",
         "ECL_park_low",
         "ECL_demo",
+        "wobj_x2",
     ]
 
     abbs, _ = connect_to_robots(rob_nums)
@@ -100,7 +101,7 @@ if __name__ == "__main__":
         configs.append(
             load_config_json(
                 "configs/presets/R{}".format(rob_num),
-                preset_name[5] + ".json",
+                preset_name[6] + ".json",
             )
         )
 

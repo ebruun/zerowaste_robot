@@ -1,3 +1,7 @@
+make sure:
+wobj = wobj0
+tool = calibration tool
+
 x1: [Frame(Point(2117.427, 237.057, 695.275), Vector(-0.831, 0.545, 0.109), Vector(0.377, 0.697, -0.610))]
 x2: [Frame(Point(1775.055, 240.101, 695.195), Vector(-0.831, 0.545, 0.109), Vector(0.377, 0.697, -0.610))]
 y1: [Frame(Point(1774.582, 51.813, 691.629), Vector(-0.831, 0.546, 0.109), Vector(0.377, 0.697, -0.610))]
