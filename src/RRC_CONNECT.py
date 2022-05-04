@@ -13,23 +13,21 @@ def _connect_to_single_robot(rob_num):
     abb = rrc.AbbClient(ros, "/rob" + str(rob_num))
 
     if rob_num == 1:
-        # abb.send(rrc.SetWorkObject("rob1_acadia_EBIT_01"))
+        abb.send(rrc.SetWorkObject("ecl_rob1_zerowaste"))
         abb.send(rrc.SetTool("ecl_rob1_pneumatic_gripper"))
         # abb.send(rrc.SetMaxSpeed(override=100, max_tcp=10000))
-        # abb.send(rrc.SetWorkObject('ECL_platform'))
-        abb.send(rrc.SetWorkObject("wobj0"))
+        # abb.send(rrc.SetWorkObject("rob1_acadia_EBIT_01"))
         # abb.send(rrc.SetTool("ecl_rob1_calibration_tip"))
     elif rob_num == 2:
-        # abb.send(rrc.SetWorkObject("rob2_acadia_EBIT_01"))
+        abb.send(rrc.SetWorkObject("ecl_rob2_zerowaste"))
         abb.send(rrc.SetTool("ecl_rob2_pneumatic_gripper"))
         # abb.send(rrc.SetMaxSpeed(override=100, max_tcp=10000))
-        # abb.send(rrc.SetWorkObject('ECL_platform'))
-        abb.send(rrc.SetWorkObject("wobj0"))
+        # abb.send(rrc.SetWorkObject("rob2_acadia_EBIT_01"))
         # abb.send(rrc.SetTool("ecl_rob2_calibration_tip"))
     elif rob_num == 3:
         abb.send(rrc.SetWorkObject("wobj0"))
-        abb.send(rrc.SetTool("ecl_rob3_calibration_tip"))
-        # abb.send(rrc.SetTool("ecl_rob3_pneumatic_gripper"))
+        abb.send(rrc.SetTool("ecl_rob3_pneumatic_gripper"))
+        # abb.send(rrc.SetTool("ecl_rob3_calibration_tip"))
 
     abb.send(rrc.PrintText("CONNECTED TO {}, press play to cont...".format("/rob" + str(rob_num))))
     abb.send_and_wait(rrc.Stop(feedback_level=rrc.FeedbackLevel.DONE))

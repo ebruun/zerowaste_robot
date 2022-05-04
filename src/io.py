@@ -78,25 +78,41 @@ def save_transformation_as_matrix_yaml(transformation, folder, output_file):
     s.release()
 
 
-def save_wobj_as_matrix_yaml(rob_num, folder, output_file):
-    """Create wobj to world 0 transform (hard-coded values from robot studio)"""
+def save_wobj_as_matrix_yaml(rob_nums, wobj_name, folder, output_file):
+    """
+    Create H4, transformation between WORLD0 and WOBJ
+    (hard-coded wobj values from robot studio)
+    """
 
-    if rob_num == 1:
-        q1 = [0.999971, 0.000727707, -0.00129108, -0.00745658]
-        f = Frame.from_quaternion(q1, point=[-680.624, 1567.49, 823.009])
+    print(output_file)
+
+    for rob_num in rob_nums:
+
+        output_file2 = output_file.format(rob_num)
+
+        if rob_num == 1:
+            if wobj_name == "ACADIA":
+                q1 = [0.999971, 0.000727707, -0.00129108, -0.00745658]
+                f = Frame.from_quaternion(q1, point=[-680.624, 1567.49, 823.009])
+            elif wobj_name == "ZEROWASTE":
+                q1 = [0.999976, -0.00604606, -0.00149283, -0.0029774]
+                f = Frame.from_quaternion(q1, point=[3103.33, 1481.11, 366.83])
+        elif rob_num == 2:
+            if wobj_name == "ACADIA":
+                q1 = [0.999964, 0.00426176, -0.00158504, -0.00717332]
+                f = Frame.from_quaternion(q1, point=[-681.039, 1564.71, 817.284])
+            elif wobj_name == "ZEROWASTE":
+                q1 = [0.99999, -0.00305874, -0.00165978, -0.0029736]
+                f = Frame.from_quaternion(q1, point=[3107.65, 1478.91, 367.994])
+
         q2 = f.quaternion
         allclose(q1, q2, tol=1e-03)
-    elif rob_num == 2:
-        q1 = [0.999964, 0.00426176, -0.00158504, -0.00717332]
-        f = Frame.from_quaternion(q1, point=[-681.039, 1564.71, 817.284])
-        q2 = f.quaternion
-        allclose(q1, q2, tol=1e-03)
 
-    save_frames_as_matrix_yaml(
-        frames=[f],
-        folder=folder,
-        output_file=output_file,
-    )
+        save_frames_as_matrix_yaml(
+            frames=[f],
+            folder=folder,
+            output_file=output_file2,
+        )
 
 
 # -- LOADING DATA FUNCTIONS --#
@@ -162,12 +178,13 @@ def load_o3d_view_settings(folder, name):
 
 
 if __name__ == "__main__":
-    # _create_file_path("transformations/another", "H1_cam_obj.yaml")
-    # _create_file_path("calibration_data", "pos{:02d}.yaml", i=3)
-    # _create_file_path("calibration_data{}", "pos.yaml", rob_num=2)
-
-    rob_num = 2
-    # save_wobj_as_matrix_yaml(rob_num,"transformations","R{}_H4_world0_rbase.yaml".format(rob_num))
+    rob_nums = [1, 2]
+    save_wobj_as_matrix_yaml(
+        rob_nums=rob_nums,
+        wobj_name="ZEROWASTE",
+        folder="transformations",
+        output_file="R{}_H4_world0_rbase.yaml",
+    )
 
     # folder = "data/stitch_shed"
     # name = "_o3d_view_settings_R{}.json".format(rob_num)

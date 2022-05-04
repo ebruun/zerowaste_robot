@@ -56,6 +56,8 @@ def _transform_pickup_frames(abbs, rob_nums, folders, filenames):
         abb.send_and_wait(rrc.Stop(feedback_level=rrc.FeedbackLevel.DONE))
 
         f = [abb.send_and_wait(rrc.GetFrame(), timeout=3)]
+
+        # Save H3 for this particular location
         save_frames_as_matrix_yaml(
             frames=f, folder=folders[0], output_file=filenames[2].format(rob_num)
         )
@@ -66,10 +68,10 @@ def _transform_pickup_frames(abbs, rob_nums, folders, filenames):
         # what camera sees
         F_objects = load_as_frames_yaml(folder=folders[0], name=filenames[0].format(rob_num))
 
-        # transformation matrix between TOOL0 and CAMERA
+        # H2: transformation matrix between TOOL0 and CAMERA
         T2 = load_as_transformation_yaml(folder=folders[0], name=filenames[1].format(rob_num))
 
-        # transformation matrix between ROBOT BASE (WOBJ) and TOOL0
+        # H3: transformation matrix between ROBOT BASE (WOBJ) and TOOL0
         T3 = load_as_transformation_yaml(folder=folders[0], name=filenames[2].format(rob_num))
 
         T = Transformation.concatenated(T3, T2)
@@ -124,6 +126,6 @@ def pick_ECL_demo(abbs, rob_nums):
 
 
 if __name__ == "__main__":
-    rob_nums = [1, 2]
+    rob_nums = [2]
     abbs, robots = connect_to_robots(rob_nums)
     pick_ECL_demo(abbs, rob_nums)
