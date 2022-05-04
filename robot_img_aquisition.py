@@ -67,10 +67,15 @@ def _robot_camera_aquisition(abbs, rob_nums, pose_range, folders, filenames):
 
             try:
                 camera = camera_connect(rob_num)
-                settings = camera_capture_settings(camera)
             except RuntimeError:
-                print("--camera already connected")
-                print("--or ZIVID studio is open (close it!)")
+                print("--camera connect error: camera already connected")
+                print("--camera connect error: or ZIVID studio is open (close it!)")
+
+            settings = camera_capture_settings(
+                camera,
+                folder="../zerowaste/input_settings",
+                input_file="capture_settings_z{}_shed.yml".format(rob_num),
+            )
 
             camera_capture_and_save(
                 camera,
@@ -167,5 +172,5 @@ if __name__ == "__main__":
 
     # aquisition_calibration(rob_nums, save_config_n=False, pose_range=range(1, 31))
     # aquisition_ECL_demo(rob_nums, save_config_n=False, pose_range=range(1, 5))
-    aquisition_shed(rob_nums, save_config_n=False, pose_range=range(1, 5))
+    aquisition_shed(rob_nums, save_config_n=False, pose_range=range(1, 8))
     # wobj_calibration(rob_nums, save_config_n=99)

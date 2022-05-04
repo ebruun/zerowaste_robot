@@ -77,7 +77,7 @@ def _transform_pickup_frames(abbs, rob_nums, folders, filenames):
         T = Transformation.concatenated(T3, T2)
 
         F_touch = F_objects[0].transformed(T)  # Just take first object seen
-        F_far = _offset_frame(F_touch, -300)  # almost touching member
+        F_far = _offset_frame(F_touch, -150)  # almost touching member
         F_touch = _offset_frame(F_touch, 50)
 
         F.append([F_far, F_touch])
@@ -126,6 +126,6 @@ def pick_ECL_demo(abbs, rob_nums):
 
 
 if __name__ == "__main__":
-    rob_nums = [2]
+    rob_nums = [1]
     abbs, robots = connect_to_robots(rob_nums)
     pick_ECL_demo(abbs, rob_nums)

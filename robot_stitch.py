@@ -240,14 +240,15 @@ if __name__ == "__main__":
         "full_pcd_stitched.pts",
     ]
 
-    rob_nums = [1, 2]
+    rob_nums = [2]
 
     stitch_shed(
         rob_nums,
-        transform=False,
-        stitch=False,
+        transform=True,
+        stitch=True,
         stitch_full=True,
-        pose_range=range(1, 5),
+        pose_range=range(1, 8),
         vis_on=True,
     )
+
     # stitch_ECL_demo(rob_nums, transform=True, stitch=True, stitch_full=True, vis_on=True)
