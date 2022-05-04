@@ -176,6 +176,7 @@ def stitch_shed(
         "R{}_H4_world0_rbase.yaml",
         "_R{}_pcd_stitched.pts",
         "_o3d_view_settings_R{}.json",
+        "_o3d_view_settings_full.json",
         "pcd_full.pts",
     ]
 
@@ -241,5 +242,12 @@ if __name__ == "__main__":
 
     rob_nums = [1, 2]
 
-    # stitch_shed(rob_nums, transform=False, stitch=True, vis_on=True)
-    stitch_ECL_demo(rob_nums, transform=True, stitch=True, stitch_full=True, vis_on=True)
+    stitch_shed(
+        rob_nums,
+        transform=False,
+        stitch=False,
+        stitch_full=True,
+        pose_range=range(1, 5),
+        vis_on=True,
+    )
+    # stitch_ECL_demo(rob_nums, transform=True, stitch=True, stitch_full=True, vis_on=True)

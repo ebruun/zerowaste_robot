@@ -165,7 +165,7 @@ if __name__ == "__main__":
 
     # set "save_config_n" to FALSE to execute aquisition
 
-    aquisition_calibration(rob_nums, save_config_n=False, pose_range=range(1, 31))
+    # aquisition_calibration(rob_nums, save_config_n=False, pose_range=range(1, 31))
     # aquisition_ECL_demo(rob_nums, save_config_n=False, pose_range=range(1, 5))
-    # aquisition_shed(rob_nums, save_config_n=999, pose_range=range(61, 62))
+    aquisition_shed(rob_nums, save_config_n=False, pose_range=range(1, 5))
     # wobj_calibration(rob_nums, save_config_n=99)

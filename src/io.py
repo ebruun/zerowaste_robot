@@ -35,7 +35,9 @@ def _generate_range(folder, pose_range=False):
         a = _create_file_path(folder, "")
         num_files = len(glob.glob(a.__str__() + "/*"))
 
+        # normally +1
         pose_range = range(1, num_files + 1)
+        print(pose_range)
 
     return pose_range
 
