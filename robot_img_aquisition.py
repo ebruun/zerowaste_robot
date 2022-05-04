@@ -147,10 +147,7 @@ def wobj_calibration(rob_nums, save_config_n=False, pose_range=False):
 
     abbs, robots = connect_to_robots(rob_nums)
 
-    if save_config_n:  # condfigs are already saved, no need to overwrite
-        # _save_multi_configs(
-        #     rob_nums, abbs, robots, folders[0], filenames[0].format(save_config_n, width=3)
-        # )
+    if save_config_n:  # configs are already saved, no need to overwrite
 
         for abb, rob_num in zip(abbs, rob_nums):
             f_at_config = [abb.send_and_wait(rrc.GetFrame(), timeout=3)]
@@ -164,11 +161,11 @@ def wobj_calibration(rob_nums, save_config_n=False, pose_range=False):
 
 
 if __name__ == "__main__":
-    rob_nums = [1]
+    rob_nums = [1, 2]
 
     # set "save_config_n" to FALSE to execute aquisition
 
-    # aquisition_calibration(rob_nums, save_config_n=999, pose_range=range(21, 22))
+    aquisition_calibration(rob_nums, save_config_n=False, pose_range=range(1, 31))
     # aquisition_ECL_demo(rob_nums, save_config_n=False, pose_range=range(1, 5))
     # aquisition_shed(rob_nums, save_config_n=999, pose_range=range(61, 62))
-    wobj_calibration(rob_nums, save_config_n=99)
+    # wobj_calibration(rob_nums, save_config_n=99)
