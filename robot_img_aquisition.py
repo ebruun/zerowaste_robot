@@ -1,10 +1,20 @@
+import copy
+import zivid
+
 # COMPAS IMPORTS
 import compas_rrc as rrc
 
 # LOCAL IMPORTS
 from src.RRC_CONNECT import connect_to_robots
 from src.robot_commands import configs_to_move, get_current_config
-from src.io import save_config_json, save_frames_as_matrix_yaml, load_config_json, _generate_range
+from src.io import (
+    save_config_json,
+    save_frames_as_matrix_yaml,
+    load_config_json,
+    _generate_range,
+    _create_file_path,
+)
+from robot_stitch import _transform_single_pointcloud
 
 from src_cam.camera.use import (
     camera_connect,
@@ -13,6 +23,7 @@ from src_cam.camera.use import (
 )
 
 from src_cam.utility.io import load_pointcloud
+from src_cam.camera.use import pc_downsample
 from src_cam.camera.convert import convert2png
 
 
@@ -28,7 +39,7 @@ def _save_multi_configs(rob_nums, abbs, robots, folder, filename):
         )
 
 
-def _robot_camera_aquisition(abbs, rob_nums, pose_range, folders, filenames):
+def _robot_camera_aquisition(abbs, rob_nums, pose_range, folders, filenames, transform=False):
     print("START AQUISITION PROCESS")
 
     for i in pose_range:
@@ -53,7 +64,7 @@ def _robot_camera_aquisition(abbs, rob_nums, pose_range, folders, filenames):
         abb.send(rrc.PrintText("MOVE CONFIG_{0:03} DONE, play for image".format(i)))
         abb.send_and_wait(rrc.Stop(feedback_level=rrc.FeedbackLevel.DONE))
 
-        # --save frame and image data to be used for calibration --#
+        # --save robot frame and image data for this aquisition --#
         abb.send(rrc.PrintText("Saving frame and taking image..."))
         for abb, rob_num in zip(abbs, rob_nums):
             print("\nTAKING IMAGE WITH R{}".format(rob_num))
@@ -77,17 +88,15 @@ def _robot_camera_aquisition(abbs, rob_nums, pose_range, folders, filenames):
                 input_file="capture_settings_z{}_shed.yml".format(rob_num),
             )
 
-            camera_capture_and_save(
-                camera,
-                settings,
-                folder=folders[1].format(rob_num),
-                output_file=filenames[2].format(i) + ".zdf",
-            )
+            with camera.capture(settings) as frame:
+                pc = frame.point_cloud()
 
-            pc, _ = load_pointcloud(
-                folder=folders[1].format(rob_num),
-                input_file=filenames[2].format(i) + ".zdf",
-            )
+                pc_downsample(pc, downsample_factor=4)
+
+                if transform:
+                    _transform_single_pointcloud(rob_num, frame, i, folders, filenames)
+
+                frame.save(_create_file_path(folders[1].format(rob_num), filenames[5].format(i)))
 
             _ = convert2png(
                 pointcloud=pc,
@@ -107,7 +116,7 @@ def aquisition_calibration(rob_nums, save_config_n=False, pose_range=False):
 
     abbs, robots = connect_to_robots(rob_nums)
 
-    if save_config_n:
+    if save_config_n:  # Only save configs, no camera aquisition
         _save_multi_configs(
             rob_nums, abbs, robots, folders[0], filenames[0].format(save_config_n, width=3)
         )
@@ -122,7 +131,7 @@ def aquisition_ECL_demo(rob_nums, save_config_n=False, pose_range=False):
 
     abbs, robots = connect_to_robots(rob_nums)
 
-    if save_config_n:
+    if save_config_n:  # Only save configs, no camera aquisition
         _save_multi_configs(
             rob_nums, abbs, robots, folders[0], filenames[0].format(save_config_n, width=3)
         )
@@ -132,18 +141,26 @@ def aquisition_ECL_demo(rob_nums, save_config_n=False, pose_range=False):
 
 
 def aquisition_shed(rob_nums, save_config_n=False, pose_range=False):
-    folders = ["configs/stitch_shed/R{}", "data/stitch_shed/R{}"]
-    filenames = ["stitch_shed_{0:0{width}}.json", "pos{:02d}.yaml", "img{:02d}"]
+    folders = ["configs/stitch_shed/R{}", "data/stitch_shed/R{}", "transformations"]
+    filenames = [
+        "stitch_shed_{0:0{width}}.json",
+        "pos{:02d}.yaml",
+        "img{:02d}",
+        "R{}_H2_tool0_cam.yaml",
+        "R{}_H4_world0_rbase.yaml",
+        "img{:02d}_trns.ply",
+    ]
 
     abbs, robots = connect_to_robots(rob_nums)
 
-    if save_config_n:
+    if save_config_n:  # Only save configs, no camera aquisition
         _save_multi_configs(
             rob_nums, abbs, robots, folders[0], filenames[0].format(save_config_n, width=3)
         )
     else:
         pose_range = _generate_range(folders[0].format(rob_nums[0]), pose_range)
-        _robot_camera_aquisition(abbs, rob_nums, pose_range, folders, filenames)
+        transform = True
+        _robot_camera_aquisition(abbs, rob_nums, pose_range, folders, filenames, transform)
 
 
 def wobj_calibration(rob_nums, save_config_n=False, pose_range=False):
@@ -153,7 +170,6 @@ def wobj_calibration(rob_nums, save_config_n=False, pose_range=False):
     abbs, robots = connect_to_robots(rob_nums)
 
     if save_config_n:  # configs are already saved, no need to overwrite
-
         for abb, rob_num in zip(abbs, rob_nums):
             f_at_config = [abb.send_and_wait(rrc.GetFrame(), timeout=3)]
             print(f_at_config)
