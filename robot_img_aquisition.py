@@ -167,7 +167,7 @@ def wobj_calibration(rob_nums, save_config_n=False, pose_range=False):
     folders = ["configs/_wobj/R{}", "data/_wobj/R{}"]
     filenames = ["wobj_{0:0{width}}.json", "pos{:02d}.yaml", "img{:02d}"]
 
-    abbs, robots = connect_to_robots(rob_nums)
+    abbs, _ = connect_to_robots(rob_nums)
 
     if save_config_n:  # configs are already saved, no need to overwrite
         for abb, rob_num in zip(abbs, rob_nums):
@@ -186,7 +186,8 @@ if __name__ == "__main__":
 
     # set "save_config_n" to FALSE to execute aquisition
 
+    aquisition_shed(rob_nums, save_config_n=False, pose_range=range(1, 8))
+
     # aquisition_calibration(rob_nums, save_config_n=False, pose_range=range(1, 31))
     # aquisition_ECL_demo(rob_nums, save_config_n=False, pose_range=range(1, 5))
-    aquisition_shed(rob_nums, save_config_n=False, pose_range=range(1, 8))
     # wobj_calibration(rob_nums, save_config_n=99)

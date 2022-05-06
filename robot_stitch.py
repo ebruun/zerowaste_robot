@@ -16,6 +16,9 @@ from src_cam.utility.io import load_pointcloud
 
 
 def _transform_single_pointcloud(rob_num, frame, i, folders, filenames):
+    """
+    transform a single point cloud for a single robot
+    """
 
     print("\n#######FOR R{}#########".format(rob_num))
 
@@ -35,6 +38,9 @@ def _transform_single_pointcloud(rob_num, frame, i, folders, filenames):
 
 
 def _transform_pointclouds(rob_nums, pose_range, folders, filenames):
+    """
+    transform all pointclouds for multipled robots
+    """
 
     print("START POINTCLOUD TRANSFORM\n")
 
@@ -67,6 +73,9 @@ def _transform_pointclouds(rob_nums, pose_range, folders, filenames):
 
 def _visualize_pcd(pcd, folder, filename):
     vis_settings = load_o3d_view_settings(folder, filename)
+
+    pcd.estimate_normals()
+
     o3d.visualization.draw_geometries(
         [pcd],
         left=10,
@@ -80,7 +89,36 @@ def _visualize_pcd(pcd, folder, filename):
     )
 
 
+def _visualize_pcd_interactive(pcd, folder, filename):
+    print("")
+    print("1) Please pick at least three correspondences using [shift + left click]")
+    print("   Press [shift + right click] to undo point picking")
+    print("2) Afther picking points, press q for close the window")
+
+    vis_settings = load_o3d_view_settings(folder, filename)
+    pcd.estimate_normals()
+
+    vis = o3d.visualization.VisualizerWithEditing()
+    vis.create_window()
+    vis.add_geometry(pcd)
+
+    ctr = vis.get_view_control()
+    ctr.set_front(vis_settings["front"])
+    ctr.set_up(vis_settings["up"])
+    ctr.set_zoom(vis_settings["zoom"])
+    ctr.set_lookat(vis_settings["lookat"])
+
+    vis.run()  # user picks points
+    vis.destroy_window()
+    print("")
+
+    return vis.get_picked_points()
+
+
 def _stitch_pcd(rob_nums, pc_range, folders, filenames, vis_on=False):
+    """
+    combine pointclouds from all captures with a single robot
+    """
     pcd_vars = {
         "voxels": 0.004,
         "neighbors": 30,
@@ -135,6 +173,9 @@ def _stitch_pcd(rob_nums, pc_range, folders, filenames, vis_on=False):
 
 
 def _stitch_full(folders, filenames, vis_on=False):
+    """
+    combine pointclouds from both robots
+    """
     pcd_vars = {
         "voxels": 0.004,
         "neighbors": 30,
@@ -174,11 +215,16 @@ def _stitch_full(folders, filenames, vis_on=False):
     )
 
     if vis_on:
-        _visualize_pcd(
+        p = _visualize_pcd_interactive(
             pcd_combined,
             folders[3].format(rob_num),
             filenames[7],
         )
+        print(p)
+        print(pcd_combined.points[p[0]])
+        print(pcd_combined.normals[p[0]])
+
+        print("hey")
 
     o3d.io.write_point_cloud(
         _create_file_path(
@@ -205,7 +251,7 @@ def stitch_shed(
         "R{}_H4_world0_rbase.yaml",
         "_R{}_pcd_stitched.pts",
         "_o3d_view_settings_R{}.json",
-        "_o3d_view_settings_full.json",
+        "_o3d_view_settings_full2.json",
         "pcd_full.pts",
     ]
 
@@ -263,7 +309,7 @@ if __name__ == "__main__":
         stitch=False,
         stitch_full=True,
         pose_range=range(1, 8),
-        vis_on=False,
+        vis_on=True,
     )
 
     # stitch_ECL_demo(rob_nums, transform=True, stitch=True, stitch_full=True, vis_on=True)
