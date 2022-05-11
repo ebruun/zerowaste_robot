@@ -120,7 +120,7 @@ def _stitch_pcd(rob_nums, pc_range, folders, filenames, vis_on=False):
     combine pointclouds from all captures with a single robot
     """
     pcd_vars = {
-        "voxels": 0.004,
+        "voxels": 0.010,
         "neighbors": 30,
         "std_dev": 1.0,
         "radius": 0.08,
@@ -177,7 +177,7 @@ def _stitch_full(folders, filenames, vis_on=False):
     combine pointclouds from both robots
     """
     pcd_vars = {
-        "voxels": 0.004,
+        "voxels": 0.010,
         "neighbors": 30,
         "std_dev": 1.0,
         "radius": 0.08,
@@ -301,14 +301,14 @@ def stitch_ECL_demo(
 
 
 if __name__ == "__main__":
-    rob_nums = [1, 2]
+    rob_nums = [1]
 
     stitch_shed(
         rob_nums,
         transform=False,
-        stitch=False,
-        stitch_full=True,
-        pose_range=range(1, 8),
+        stitch=True,
+        stitch_full=False,
+        pose_range=range(1, 100),
         vis_on=True,
     )
 

@@ -182,11 +182,12 @@ def wobj_calibration(rob_nums, save_config_n=False, pose_range=False):
 
 
 if __name__ == "__main__":
-    rob_nums = [1, 2]
+    rob_nums = [1]
 
     # set "save_config_n" to FALSE to execute aquisition
 
-    aquisition_shed(rob_nums, save_config_n=False, pose_range=range(1, 8))
+    # careful 15 --> 16, and next sift to wall also
+    aquisition_shed(rob_nums, save_config_n=False, pose_range=range(60, 100))
 
     # aquisition_calibration(rob_nums, save_config_n=False, pose_range=range(1, 31))
     # aquisition_ECL_demo(rob_nums, save_config_n=False, pose_range=range(1, 5))
