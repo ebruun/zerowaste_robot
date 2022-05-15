@@ -10,6 +10,22 @@ from src.RRC_CONNECT import connect_to_robots
 from src.io import load_config_json
 
 
+def io_gripper(abb, i):
+
+    name = abb._server_protocol_check["param"].name
+
+    rob_num = int(name.split("/")[1][-1])
+
+    if i:
+        print("close gripper")
+        abb.send(rrc.SetDigital("do_{}".format(rob_num), i))
+    else:
+        print("open gripper")
+        abb.send(rrc.SetDigital("do_{}".format(rob_num), i))
+
+    time.sleep(0.2)
+
+
 def get_current_config(robot, abb, rob_num):
 
     config = robot.zero_configuration()

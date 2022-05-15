@@ -10,6 +10,9 @@ from compas.geometry import Transformation, Frame, allclose
 from compas_fab.robots import Configuration
 from compas_fab.utilities import read_data_from_json
 
+# LOCAL IMPORTS
+from src.robot_commands import get_current_config
+
 
 def _create_file_path(folder, filename, rob_num=None, i=None):
     """create output data path for config files.
@@ -51,6 +54,18 @@ def save_config_json(config, folder, output_file):
 
     with open(filepath, "w") as f:
         json.dump(c, f, indent=4)
+
+
+def save_config_json_multirob(rob_nums, abbs, robots, folder, filename):
+    """save a config for multiple robots"""
+    for abb, robot, rob_num in zip(abbs, robots, rob_nums):
+        config = get_current_config(robot, abb, rob_num)
+
+        save_config_json(
+            config,
+            folder=folder.format(rob_num),
+            output_file=filename,
+        )
 
 
 def save_frames_as_matrix_yaml(frames, folder, output_file):
