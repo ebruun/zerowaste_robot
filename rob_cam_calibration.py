@@ -76,5 +76,5 @@ if __name__ == "__main__":
 
     rob_nums = [1, 2]
 
-    # aquisition_calibration(rob_nums, save_config_n=False, pose_range=range(1, 31))
-    perform_calibration(rob_nums, pose_range=range(1, 31))
+    aquisition_calibration(rob_nums, save_config_n=False, pose_range=range(1, 31))
+    # perform_calibration(rob_nums, pose_range=range(1, 31))

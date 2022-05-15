@@ -1,16 +1,16 @@
 # COMPAS IMPORTS
 import compas_rrc as rrc
+from compas.geometry import Transformation
 
 # LOCAL IMPORTS
 from src.robot_commands import configs_to_move
 
 from src.io import (
+    _create_file_path,
+    load_as_transformation_yaml,
     save_frames_as_matrix_yaml,
     load_config_json,
-    _create_file_path,
 )
-
-from robot_stitch import _transform_single_pointcloud
 
 from src_cam.camera.use import (
     camera_connect,
@@ -19,6 +19,28 @@ from src_cam.camera.use import (
 
 from src_cam.camera.use import pc_downsample
 from src_cam.camera.convert import convert2png
+
+
+def _transform_single_pointcloud(rob_num, frame, i, folders, filenames):
+    """
+    transform a single point cloud for a single robot
+    """
+
+    print("\n#######FOR R{}#########".format(rob_num))
+
+    # transformation matrix between TOOL0 and CAMERA
+    T2 = load_as_transformation_yaml(folders[2], filenames[3].format(rob_num))
+
+    # transformation matrix between ROBOT BASE (WOBJ) and TOOL0
+    T3 = load_as_transformation_yaml(folders[1].format(rob_num), filenames[1].format(i))
+
+    # transformation matrix between WORLD0 and ROBOT BASE (WOBJ)
+    T4 = load_as_transformation_yaml(folders[2], filenames[4].format(rob_num))
+
+    T = Transformation.concatenated(T4, Transformation.concatenated(T3, T2))
+
+    pc = frame.point_cloud()
+    pc.transform(T)
 
 
 def robot_camera_aquisition(abbs, rob_nums, pose_range, folders, filenames, transform=False):
@@ -75,7 +97,7 @@ def robot_camera_aquisition(abbs, rob_nums, pose_range, folders, filenames, tran
 
                 pc_downsample(pc, downsample_factor=4)
 
-                if transform:  # to transform the pointcloud at capture (zerowaste shed)
+                if transform:  # to transform the pointcloud at capture (zerowaste)
                     _transform_single_pointcloud(rob_num, frame, i, folders, filenames)
 
                 frame.save(_create_file_path(folders[1].format(rob_num), filenames[5].format(i)))

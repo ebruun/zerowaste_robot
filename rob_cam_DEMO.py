@@ -16,21 +16,7 @@ from src.io import (
 )
 
 from src.robot_commands import frame_to_move, io_gripper
-
-
-def aquisition_ECL_demo(rob_nums, save_config_n=False, pose_range=False):
-    folders = ["configs/stitch_ECL_demo/R{}", "data/stitch_ECL_demo/R{}"]
-    filenames = ["stitch_demo_config_{0:0{width}}.json", "pos{:02d}.yaml", "img{:02d}"]
-
-    abbs, robots = connect_to_robots(rob_nums)
-
-    if save_config_n:  # Only save configs, no camera aquisition
-        save_config_json_multirob(
-            rob_nums, abbs, robots, folders[0], filenames[0].format(save_config_n, width=3)
-        )
-    else:
-        pose_range = _generate_range(folders[0].format(rob_nums[0]), pose_range)
-        robot_camera_aquisition(abbs, rob_nums, pose_range, folders, filenames)
+from src.robot_stitch import stitch_pcd_individual_rob, stitch_pcd_combine_rob
 
 
 def _offset_frame(f, offset):
@@ -90,6 +76,49 @@ def _transform_pickup_frames(abbs, rob_nums, folders, filenames):
     return F, R
 
 
+def aquisition_ECL_demo(rob_nums, save_config_n=False, pose_range=False, transform=False):
+    folders = ["configs/stitch_ECL_demo/R{}", "data/stitch_ECL_demo/R{}"]
+    filenames = ["stitch_demo_config_{0:0{width}}.json", "pos{:02d}.yaml", "img{:02d}"]
+
+    abbs, robots = connect_to_robots(rob_nums)
+
+    if save_config_n:  # Only save configs, no camera aquisition
+        save_config_json_multirob(
+            rob_nums, abbs, robots, folders[0], filenames[0].format(save_config_n, width=3)
+        )
+    else:
+        pose_range = _generate_range(folders[0].format(rob_nums[0]), pose_range)
+        robot_camera_aquisition(abbs, rob_nums, pose_range, folders, filenames, transform)
+
+
+def stitch_ECL_demo(rob_nums, stitch=False, stitch_full=False, pose_range=False, vis_on=False):
+    folders = [
+        "transformations",
+        "configs/stitch_ECL_demo/R{}",
+        "data/stitch_ECL_demo/R{}",
+        "data/stitch_ECL_demo",
+    ]
+    filenames = [
+        "img{:02d}.zdf",
+        "img{:02d}_trns.ply",
+        "R{}_H2_tool0_cam.yaml",
+        "pos{:02d}.yaml",
+        "R{}_H4_world0_rbase.yaml",
+        "_R{}_pcd_stitched.pts",
+        "_o3d_view_settings_R{}.json",
+        "_o3d_view_settings_full.json",
+        "pcd_full.pts",
+    ]
+
+    pose_range = _generate_range(folders[1].format(rob_nums[0]), pose_range)
+
+    if stitch:
+        stitch_pcd_individual_rob(rob_nums, pose_range, folders, filenames, vis_on)
+
+    if stitch_full:
+        stitch_pcd_combine_rob(folders, filenames, vis_on)
+
+
 def pick_ECL_demo(abbs, rob_nums):
     """Pickup single members"""
 
@@ -133,6 +162,13 @@ if __name__ == "__main__":
     rob_nums = [1]
     abbs, robots = connect_to_robots(rob_nums)
 
-    # aquisition_ECL_demo(rob_nums, save_config_n=False, pose_range=range(1, 5))
+    # aquisition_ECL_demo(
+    #     rob_nums,
+    #     save_config_n=False,
+    #     pose_range=range(1, 5),
+    #     transform=True
+    #     )
+
+    stitch_ECL_demo(rob_nums, transform=True, stitch=True, stitch_full=True, vis_on=True)
 
     pick_ECL_demo(abbs, rob_nums)
