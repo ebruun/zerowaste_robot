@@ -1,3 +1,6 @@
+# PYTHON IMPORTS
+import json
+
 # COMPAS IMPORTS
 import compas_rrc as rrc
 
@@ -5,12 +8,14 @@ import compas_rrc as rrc
 from src.RRC_CONNECT import connect_to_robots
 from src.robot_camera import robot_camera_aquisition
 
-from src.io import (
-    _generate_range,
-    save_config_json_multirob,
-)
+from src.io import _generate_range, save_config_json_multirob, save_pnts_norm_json
 
-from src.robot_stitch import stitch_pcd_individual_rob, stitch_pcd_combine_rob
+from src.process_pcd import (
+    pcd_stitch_individual_rob,
+    pcd_stitch_combine_rob,
+    pcd_load,
+    pcd_pick_points,
+)
 
 
 def aquisition_zerowaste(rob_nums, save_config_n=False, pose_range=False, transform=False):
@@ -50,31 +55,86 @@ def stitch_zerowaste(rob_nums, stitch=False, stitch_full=False, pose_range=False
         "R{}_H4_world0_rbase.yaml",
         "_R{}_pcd_stitched.pts",
         "_o3d_view_settings_R{}.json",
-        "_o3d_view_settings_full2.json",
+        "_o3d_view_settings_full.json",
         "pcd_full.pts",
     ]
 
     pose_range = _generate_range(folders[1].format(rob_nums[0]), pose_range)
 
     if stitch:
-        stitch_pcd_individual_rob(rob_nums, pose_range, folders, filenames, vis_on)
+        # HD
+        pcd_vars = {
+            "voxels": 0.001,
+            "neighbors": 30,
+            "std_dev": 1.0,
+            "radius": 0.08,
+            "radius_pnts": 30,
+        }
+
+        # LD
+        pcd_vars = {
+            "voxels": 0.010,
+            "neighbors": 20,
+            "std_dev": 1.0,
+            "radius": 0.08,
+            "radius_pnts": 30,
+        }
+
+        pcd_stitch_individual_rob(rob_nums, pose_range, folders, filenames, pcd_vars, vis_on)
 
     if stitch_full:
-        stitch_pcd_combine_rob(folders, filenames, vis_on)
+        # HD
+        pcd_vars = {
+            "voxels": 0.001,
+            "neighbors": 30,
+            "std_dev": 2.0,
+            "radius": 0.08,
+            "radius_pnts": 30,
+        }
+
+        # LD
+        pcd_vars = {
+            "voxels": 0.010,
+            "neighbors": 30,
+            "std_dev": 2.0,
+            "radius": 0.08,
+            "radius_pnts": 30,
+        }
+
+        pcd_stitch_combine_rob(folders, filenames, pcd_vars, vis_on)
+
+
+def select_pnts_zerowaste(member):
+    folders = ["data/stitch_shed/_LD_saved", "data/stitch_shed/", "data_path_plan/"]
+    filenames = [
+        "_o3d_view_settings_full_door.json",
+        "pcd_full_RH_cleaned.ply",
+        "pcd_full_RH_cleaned.pts",
+        "member_planes_{}.json".format(member),
+    ]
+
+    pcd = pcd_load(folders, filenames)
+    pnts = pcd_pick_points(pcd, folders, filenames)
+
+    for p in pnts:
+        print("picked {}: dims = {} and norm = {}".format(p, pcd.points[p], pcd.normals[p]))
+
+    save_pnts_norm_json(pnts, folders[2], filenames[3])
 
 
 if __name__ == "__main__":
-    rob_nums = [1]
+    rob_nums = [2]
 
     # set "save_config_n" to FALSE to execute aquisition
 
     # careful 15 --> 16, and next shift to wall also
-    aquisition_zerowaste(rob_nums, save_config_n=False, pose_range=range(60, 100), transform=True)
+    # aquisition_zerowaste(rob_nums, save_config_n=False, pose_range=range(62, 63), transform=True)
 
-    stitch_zerowaste(
-        rob_nums,
-        stitch=True,
-        stitch_full=False,
-        pose_range=range(1, 100),
-        vis_on=True,
-    )
+    # stitch_zerowaste(
+    #     rob_nums,
+    #     stitch=False,
+    #     stitch_full=True,
+    #     vis_on=True,
+    # )
+
+    select_pnts_zerowaste("P1_L")

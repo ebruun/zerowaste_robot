@@ -7,3 +7,4 @@ data/*/*/_imgs/*
 !data/_wobj/*/*.yaml
 
 configs/_test
+data/stitch_shed/_HD_saved

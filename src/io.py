@@ -68,6 +68,14 @@ def save_config_json_multirob(rob_nums, abbs, robots, folder, filename):
         )
 
 
+def save_pnts_norm_json(pnts, folder, output_file):
+
+    filepath = _create_file_path(folder, output_file)
+
+    with open(filepath, "w") as f:
+        json.dump(pnts, f, indent=4)
+
+
 def save_frames_as_matrix_yaml(frames, folder, output_file):
     file_path = _create_file_path(folder, output_file)
     s = cv.FileStorage(file_path.__str__(), cv.FileStorage_WRITE)

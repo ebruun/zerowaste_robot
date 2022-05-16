@@ -16,7 +16,7 @@ from src.io import (
 )
 
 from src.robot_commands import frame_to_move, io_gripper
-from src.robot_stitch import stitch_pcd_individual_rob, stitch_pcd_combine_rob
+from src.process_pcd import pcd_stitch_individual_rob, pcd_stitch_combine_rob
 
 
 def _offset_frame(f, offset):
@@ -113,10 +113,10 @@ def stitch_ECL_demo(rob_nums, stitch=False, stitch_full=False, pose_range=False,
     pose_range = _generate_range(folders[1].format(rob_nums[0]), pose_range)
 
     if stitch:
-        stitch_pcd_individual_rob(rob_nums, pose_range, folders, filenames, vis_on)
+        pcd_stitch_individual_rob(rob_nums, pose_range, folders, filenames, vis_on)
 
     if stitch_full:
-        stitch_pcd_combine_rob(folders, filenames, vis_on)
+        pcd_stitch_combine_rob(folders, filenames, vis_on)
 
 
 def pick_ECL_demo(abbs, rob_nums):
