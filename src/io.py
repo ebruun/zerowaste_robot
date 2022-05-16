@@ -71,20 +71,27 @@ def save_config_json_multirob(rob_nums, abbs, robots, folder, filename):
 
 
 def save_pnts_norm_json(pnts, folder, output_file):
+    """
+    save the point triplet dictionary to JSON, if file already exists append the current JSOn to the existing
+    """
 
     filepath = _create_file_path(folder, output_file)
 
     if os.path.exists(filepath):
-        print("file exists")
+        print("json file exists")
 
         with open(filepath, "r") as f:
             data = json.load(f)
-            print(data)
-    else:
-        print("file does not exist")
+            start_i = len(data)
 
-        with open(filepath, "w") as f:
-            json.dump(pnts, f, indent=4)
+            for i, (pnt, value) in enumerate(pnts.items()):
+                data[start_i + i] = value
+    else:
+        print("json file does not exist")
+        data = pnts
+
+    with open(filepath, "w") as f:
+        json.dump(data, f, indent=4)
 
 
 def save_frames_as_matrix_yaml(frames, folder, output_file):
@@ -222,5 +229,5 @@ if __name__ == "__main__":
     #     output_file="R{}_H4_world0_rbase.yaml",
     # )
 
-    member = "D1_L"
+    member = "D2_L"
     save_pnts_norm_json([1, 2, 3], "data_path_plan/", "member_planes_{}.json".format(member))
