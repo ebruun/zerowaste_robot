@@ -114,11 +114,28 @@ def pcd_pick_points(pcd, folders, filenames):
         filenames[0],
     )
 
+    if len(pnts) % 3:
+        print("not a multiple of 3 points saved")
+        return 0
+
     pnts_dict = {}
+    cnt = 0
+    for i in range(0, len(pnts), 3):
 
-    for i, p in enumerate(pnts):
+        p_mid = list(pcd.points[pnts[i]])
+        n_mid = list(pcd.normals[pnts[i]])
 
-        pnts_dict[i] = {"p_xyz": list(pcd.points[p]), "n_xyz": list(pcd.normals[p])}
+        p_x1 = list(pcd.points[pnts[i + 1]])
+        p_y1 = list(pcd.points[pnts[i + 2]])
+
+        pnts_dict[cnt] = {
+            "p_mid_xyz": p_mid,
+            "p_x1_xyz": p_x1,
+            "p_y1_xyz": p_y1,
+            "n_mid_xyz": n_mid,
+        }
+
+        cnt += 1
 
     return pnts_dict
 

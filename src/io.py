@@ -4,6 +4,7 @@ import numpy as np
 import pathlib
 import json
 import glob
+import os
 
 # COMPAS IMPORTS
 from compas.geometry import Transformation, Frame, allclose
@@ -48,6 +49,7 @@ def _generate_range(folder, pose_range=False):
 # -- SAVING DATA FUNCTIONS --#
 def save_config_json(config, folder, output_file):
     """save a config for a single robot"""
+
     filepath = _create_file_path(folder, output_file)
 
     c = config.to_data()
@@ -72,8 +74,17 @@ def save_pnts_norm_json(pnts, folder, output_file):
 
     filepath = _create_file_path(folder, output_file)
 
-    with open(filepath, "w") as f:
-        json.dump(pnts, f, indent=4)
+    if os.path.exists(filepath):
+        print("file exists")
+
+        with open(filepath, "r") as f:
+            data = json.load(f)
+            print(data)
+    else:
+        print("file does not exist")
+
+        with open(filepath, "w") as f:
+            json.dump(pnts, f, indent=4)
 
 
 def save_frames_as_matrix_yaml(frames, folder, output_file):
@@ -203,15 +214,13 @@ def load_o3d_view_settings(folder, name):
 
 
 if __name__ == "__main__":
-    rob_nums = [1, 2]
-    save_wobj_as_matrix_yaml(
-        rob_nums=rob_nums,
-        wobj_name="ZEROWASTE",
-        folder="transformations",
-        output_file="R{}_H4_world0_rbase.yaml",
-    )
+    # rob_nums = [1, 2]
+    # save_wobj_as_matrix_yaml(
+    #     rob_nums=rob_nums,
+    #     wobj_name="ZEROWASTE",
+    #     folder="transformations",
+    #     output_file="R{}_H4_world0_rbase.yaml",
+    # )
 
-    # folder = "data/stitch_shed"
-    # name = "_o3d_view_settings_R{}.json".format(rob_num)
-    # a = load_o3d_view_settings(folder, name)
-    # print(a)
+    member = "D1_L"
+    save_pnts_norm_json([1, 2, 3], "data_path_plan/", "member_planes_{}.json".format(member))
