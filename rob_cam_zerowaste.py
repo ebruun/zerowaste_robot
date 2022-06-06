@@ -123,7 +123,7 @@ def select_pnts_zerowaste(member):
 
 
 if __name__ == "__main__":
-    rob_nums = [2]
+    rob_nums = [1]
 
     # set "save_config_n" to FALSE to execute aquisition
 
@@ -137,4 +137,4 @@ if __name__ == "__main__":
     #     vis_on=True,
     # )
 
-    select_pnts_zerowaste("J6")
+    select_pnts_zerowaste("RR7L")
