@@ -137,4 +137,4 @@ if __name__ == "__main__":
     #     vis_on=True,
     # )
 
-    select_pnts_zerowaste("RR7L")
+    select_pnts_zerowaste("SS2")
