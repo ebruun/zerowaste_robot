@@ -7,5 +7,6 @@ data/*/*/_imgs/*
 
 configs/_test
 data/stitch_shed/_HD_saved
+data/stitch_members/_HD_saved
 
 data/stitch_ECL_demo/*/*.ply

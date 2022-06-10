@@ -56,22 +56,22 @@ def stitch_members(rob_nums, stitch=False, stitch_full=False, pose_range=False, 
 
     if stitch:
         # HD
-        pcd_vars = {
-            "voxels": 0.0005,
-            "neighbors": 10,
-            "std_dev": 1.0,
-            "radius": 0.08,
-            "radius_pnts": 30,
-        }
-
-        # # LD
         # pcd_vars = {
-        #     "voxels": 0.010,
-        #     "neighbors": 20,
+        #     "voxels": 0.0005,
+        #     "neighbors": 10,
         #     "std_dev": 1.0,
         #     "radius": 0.08,
         #     "radius_pnts": 30,
         # }
+
+        # LD
+        pcd_vars = {
+            "voxels": 0.005,
+            "neighbors": 20,
+            "std_dev": 1.0,
+            "radius": 0.08,
+            "radius_pnts": 30,
+        }
 
         pcd_stitch_individual_rob(rob_nums, pose_range, folders, filenames, pcd_vars, vis_on)
 
