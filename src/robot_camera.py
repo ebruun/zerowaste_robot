@@ -4,12 +4,15 @@ from compas.geometry import Transformation
 
 # LOCAL IMPORTS
 from src.robot_commands import configs_to_move
+from src.RRC_CONNECT import connect_to_robots
 
 from src.io import (
     _create_file_path,
+    _generate_range,
     load_as_transformation_yaml,
     save_frames_as_matrix_yaml,
     load_config_json,
+    save_config_json_multirob,
 )
 
 from src_cam.camera.use import (
@@ -43,7 +46,9 @@ def _transform_single_pointcloud(rob_num, frame, i, folders, filenames):
     pc.transform(T)
 
 
-def robot_camera_aquisition(abbs, rob_nums, pose_range, folders, filenames, transform=False):
+def _execute_aquisition(abbs, rob_nums, pose_range, folders, filenames, transform=False):
+    """capture image at specified poses (need these configs saved first)"""
+
     print("START AQUISITION PROCESS")
 
     for i in pose_range:
@@ -112,3 +117,18 @@ def robot_camera_aquisition(abbs, rob_nums, pose_range, folders, filenames, tran
         abb.send_and_wait(rrc.Stop(feedback_level=rrc.FeedbackLevel.DONE))
 
     print("AQUISITIONS DONE")
+
+
+def robot_camera_aquisition(
+    rob_nums, folders, filenames, save_config_n=False, pose_range=False, transform=False
+):
+
+    abbs, robots = connect_to_robots(rob_nums)
+
+    if save_config_n:  # Only save configs, no camera aquisition
+        save_config_json_multirob(
+            rob_nums, abbs, robots, folders[0], filenames[0].format(save_config_n, width=3)
+        )
+    else:  # transform to world-0
+        pose_range = _generate_range(folders[0].format(rob_nums[0]), pose_range)
+        _execute_aquisition(abbs, rob_nums, pose_range, folders, filenames, transform)

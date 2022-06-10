@@ -1,14 +1,7 @@
-# PYTHON IMPORTS
-import json
-
-# COMPAS IMPORTS
-import compas_rrc as rrc
-
 # LOCAL IMPORTS
-from src.RRC_CONNECT import connect_to_robots
 from src.robot_camera import robot_camera_aquisition
 
-from src.io import _generate_range, save_config_json_multirob, save_pnts_norm_json
+from src.io import _generate_range, save_pnts_norm_json
 
 from src.process_pcd import (
     pcd_stitch_individual_rob,
@@ -19,25 +12,22 @@ from src.process_pcd import (
 
 
 def aquisition_zerowaste(rob_nums, save_config_n=False, pose_range=False, transform=False):
-    folders = ["configs/stitch_shed/R{}", "data/stitch_shed/R{}", "transformations"]
+
+    folders = [
+        "configs/stitch_shed/R{}",
+        "data/stitch_shed/R{}",
+        "transformations",  # needed if transformation specified
+    ]
     filenames = [
         "stitch_shed_{0:0{width}}.json",
         "pos{:02d}.yaml",
         "img{:02d}",
-        "R{}_H2_tool0_cam.yaml",
-        "R{}_H4_world0_rbase.yaml",
-        "img{:02d}_trns.ply",
+        "R{}_H2_tool0_cam.yaml",  # needed if transformation specified
+        "R{}_H4_world0_rbase.yaml",  # needed if transformation specified
+        "img{:02d}_trns.ply",  # needed if transformation specified
     ]
 
-    abbs, robots = connect_to_robots(rob_nums)
-
-    if save_config_n:  # Only save configs, no camera aquisition
-        save_config_json_multirob(
-            rob_nums, abbs, robots, folders[0], filenames[0].format(save_config_n, width=3)
-        )
-    else:  # transform to world-0
-        pose_range = _generate_range(folders[0].format(rob_nums[0]), pose_range)
-        robot_camera_aquisition(abbs, rob_nums, pose_range, folders, filenames, transform)
+    robot_camera_aquisition(rob_nums, folders, filenames, save_config_n, pose_range, transform)
 
 
 def stitch_zerowaste(rob_nums, stitch=False, stitch_full=False, pose_range=False, vis_on=False):

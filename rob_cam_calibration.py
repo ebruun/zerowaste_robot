@@ -2,12 +2,9 @@
 import zivid
 
 # COMPAS IMPORTS
-from src.RRC_CONNECT import connect_to_robots
 from src.robot_camera import robot_camera_aquisition
 
 from src.io import (
-    _generate_range,
-    save_config_json_multirob,
     load_as_transformation_yaml,
     save_transformation_as_matrix_yaml,
 )
@@ -16,18 +13,17 @@ from src_cam.utility.io import load_pointcloud
 
 
 def aquisition_calibration(rob_nums, save_config_n=False, pose_range=False):
-    folders = ["configs/calibration/R{}", "data/calibration/R{}"]
-    filenames = ["calibration_config_{0:0{width}}.json", "pos{:02d}.yaml", "img{:02d}"]
+    folders = [
+        "configs/calibration/R{}",
+        "data/calibration/R{}",  # no tranformation folder needed
+    ]
+    filenames = [
+        "calibration_config_{0:0{width}}.json",
+        "pos{:02d}.yaml",
+        "img{:02d}",  # no transformation filename needed
+    ]
 
-    abbs, robots = connect_to_robots(rob_nums)
-
-    if save_config_n:  # Only save configs, no camera aquisition
-        save_config_json_multirob(
-            rob_nums, abbs, robots, folders[0], filenames[0].format(save_config_n, width=3)
-        )
-    else:
-        pose_range = _generate_range(folders[0].format(rob_nums[0]), pose_range)
-        robot_camera_aquisition(abbs, rob_nums, pose_range, folders, filenames)
+    robot_camera_aquisition(rob_nums, folders, filenames, save_config_n, pose_range)
 
 
 def perform_calibration(rob_nums, pose_range):
