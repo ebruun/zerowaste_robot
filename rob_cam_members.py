@@ -13,25 +13,32 @@ from src.process_pcd import (
 
 
 def aquisition_members(rob_nums, save_config_n=False, pose_range=False, transform=False):
-    folders = ["configs/stitch_members/R{}", "data/stitch_members/R{}", "transformations"]
+    """perform camera aquisition for the post-disassembly scanning process"""
+
+    folders = [
+        "configs/stitch_members/R{}",
+        "data/stitch_members/R{}",
+        "transformations",  # needed if transformation specified
+    ]
+
     filenames = [
         "stitch_members_{0:0{width}}.json",
         "pos{:02d}.yaml",
         "img{:02d}",
-        "R{}_H2_tool0_cam.yaml",
-        "R{}_H4_world0_rbase.yaml",
-        "img{:02d}_trns.ply",
+        "R{}_H2_tool0_cam.yaml",  # needed if transformation specified
+        "R{}_H4_world0_rbase.yaml",  # needed if transformation specified
+        "img{:02d}_trns.ply",  # needed if transformation specified
     ]
 
     robot_camera_aquisition(rob_nums, folders, filenames, save_config_n, pose_range, transform)
 
 
-def stitch_zerowaste(rob_nums, stitch=False, stitch_full=False, pose_range=False, vis_on=False):
+def stitch_members(rob_nums, stitch=False, stitch_full=False, pose_range=False, vis_on=False):
     folders = [
         "transformations",
-        "configs/stitch_shed/R{}",
-        "data/stitch_shed/R{}",
-        "data/stitch_shed",
+        "configs/stitch_members/R{}",
+        "data/stitch_members/R{}",
+        "data/stitch_members",
     ]
     filenames = [
         "img{:02d}.zdf",
@@ -50,21 +57,21 @@ def stitch_zerowaste(rob_nums, stitch=False, stitch_full=False, pose_range=False
     if stitch:
         # HD
         pcd_vars = {
-            "voxels": 0.001,
-            "neighbors": 30,
+            "voxels": 0.0005,
+            "neighbors": 10,
             "std_dev": 1.0,
             "radius": 0.08,
             "radius_pnts": 30,
         }
 
-        # LD
-        pcd_vars = {
-            "voxels": 0.010,
-            "neighbors": 20,
-            "std_dev": 1.0,
-            "radius": 0.08,
-            "radius_pnts": 30,
-        }
+        # # LD
+        # pcd_vars = {
+        #     "voxels": 0.010,
+        #     "neighbors": 20,
+        #     "std_dev": 1.0,
+        #     "radius": 0.08,
+        #     "radius_pnts": 30,
+        # }
 
         pcd_stitch_individual_rob(rob_nums, pose_range, folders, filenames, pcd_vars, vis_on)
 
@@ -95,11 +102,11 @@ if __name__ == "__main__":
 
     # set "save_config_n" to FALSE to execute aquisition
 
-    aquisition_members(rob_nums, save_config_n=1, pose_range=range(62, 63), transform=True)
+    # aquisition_members(rob_nums, save_config_n=False, pose_range=range(1, 26), transform=True)
 
-    # stitch_zerowaste(
-    #     rob_nums,
-    #     stitch=False,
-    #     stitch_full=True,
-    #     vis_on=True,
-    # )
+    stitch_members(
+        rob_nums,
+        stitch=True,
+        stitch_full=False,
+        vis_on=True,
+    )

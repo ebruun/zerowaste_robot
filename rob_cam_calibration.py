@@ -13,6 +13,8 @@ from src_cam.utility.io import load_pointcloud
 
 
 def aquisition_calibration(rob_nums, save_config_n=False, pose_range=False):
+    """perform camera aquisition for the checkerboard calibration process"""
+
     folders = [
         "configs/calibration/R{}",
         "data/calibration/R{}",  # no tranformation folder needed
