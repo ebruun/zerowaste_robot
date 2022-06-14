@@ -119,7 +119,7 @@ if __name__ == "__main__":
     # set "save_config_n" to FALSE to execute aquisition
 
     # careful 15 --> 16, and next shift to wall also
-    aquisition_zerowaste(rob_nums, save_config_n=False, pose_range=range(62, 63), transform=True)
+    # aquisition_zerowaste(rob_nums, save_config_n=False, pose_range=range(62, 63), transform=True)
 
     # stitch_zerowaste(
     #     rob_nums,
@@ -128,4 +128,4 @@ if __name__ == "__main__":
     #     vis_on=True,
     # )
 
-    # select_pnts_zerowaste("SS2")
+    select_pnts_zerowaste("RR7R")
