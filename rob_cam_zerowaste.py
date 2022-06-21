@@ -128,4 +128,4 @@ if __name__ == "__main__":
     #     vis_on=True,
     # )
 
-    select_pnts_zerowaste("RP2")
+    select_pnts_zerowaste("RR5L")
