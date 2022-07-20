@@ -18,16 +18,17 @@ def aquisition_members(rob_nums, save_config_n=False, pose_range=False, transfor
     folders = [
         "configs/stitch_members/R{}",
         "data/stitch_members/R{}",
+        "input_settings",
         "transformations",  # needed if transformation specified
     ]
 
     filenames = [
         "stitch_members_{0:0{width}}.json",
         "pos{:02d}.yaml",
-        "img{:02d}",
-        "R{}_H2_tool0_cam.yaml",  # needed if transformation specified
-        "R{}_H4_world0_rbase.yaml",  # needed if transformation specified
-        "img{:02d}_trns.ply",  # needed if transformation specified
+        "img{:02d}",  # if transformation, save .ply, otherwise .zdf
+        "capture_settings_z{}_shed.yml",
+        "R{}_H2_tool0_cam.yaml",  # needed if transformation specified (hard-coded)
+        "R{}_H4_world0_rbase.yaml",  # needed if transformation specified (hard-coded)
     ]
 
     robot_camera_aquisition(rob_nums, folders, filenames, save_config_n, pose_range, transform)

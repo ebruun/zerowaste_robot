@@ -17,12 +17,17 @@ def aquisition_calibration(rob_nums, save_config_n=False, pose_range=False):
 
     folders = [
         "configs/calibration/R{}",
-        "data/calibration/R{}",  # no tranformation folder needed
+        "data/calibration/R{}",
+        "input_settings",
+        # no tranformation folder needed
     ]
+
     filenames = [
         "calibration_config_{0:0{width}}.json",
         "pos{:02d}.yaml",
-        "img{:02d}",  # no transformation filename needed
+        "img{:02d}",
+        "capture_settings_calibration_z{}.yml",
+        # no transformation filename needed
     ]
 
     robot_camera_aquisition(rob_nums, folders, filenames, save_config_n, pose_range)
@@ -74,5 +79,5 @@ if __name__ == "__main__":
 
     rob_nums = [1, 2]
 
-    aquisition_calibration(rob_nums, save_config_n=False, pose_range=range(1, 31))
-    # perform_calibration(rob_nums, pose_range=range(1, 31))
+    # aquisition_calibration(rob_nums, save_config_n=False, pose_range=range(1, 31))
+    perform_calibration(rob_nums, pose_range=range(1, 31))

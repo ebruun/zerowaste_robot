@@ -27,18 +27,25 @@ from src_cam.camera.convert import convert2png
 def _transform_single_pointcloud(rob_num, frame, i, folders, filenames):
     """
     transform a single point cloud for a single robot
+
+    T2 = from calibration process (one matrix for each robot)
+    T3 = the position of the TCP relative to robot base (one value per capture)
+    T4 = WOBJ used in capture expressed as a transformation (one hard-coded matrix per robot)
+
+    If you don't use T4 transformation then all pointclouds will be shown as if taken relative to the
+    world-0. They have to be transformed relative to the work object.
     """
 
     print("\n#######FOR R{}#########".format(rob_num))
 
     # transformation matrix between TOOL0 and CAMERA
-    T2 = load_as_transformation_yaml(folders[2], filenames[3].format(rob_num))
+    T2 = load_as_transformation_yaml(folders[3], filenames[4].format(rob_num))
 
     # transformation matrix between ROBOT BASE (WOBJ) and TOOL0
     T3 = load_as_transformation_yaml(folders[1].format(rob_num), filenames[1].format(i))
 
     # transformation matrix between WORLD0 and ROBOT BASE (WOBJ)
-    T4 = load_as_transformation_yaml(folders[2], filenames[4].format(rob_num))
+    T4 = load_as_transformation_yaml(folders[3], filenames[5].format(rob_num))
 
     T = Transformation.concatenated(T4, Transformation.concatenated(T3, T2))
 
@@ -93,8 +100,8 @@ def _execute_aquisition(abbs, rob_nums, pose_range, folders, filenames, transfor
 
             settings = camera_capture_settings(
                 camera,
-                folder="../zerowaste/input_settings",
-                input_file="capture_settings_z{}_shed.yml".format(rob_num),
+                folder=folders[2],
+                input_file=filenames[3].format(rob_num),
             )
 
             with camera.capture(settings) as frame:
@@ -102,10 +109,13 @@ def _execute_aquisition(abbs, rob_nums, pose_range, folders, filenames, transfor
 
                 pc_downsample(pc, downsample_factor=4)
 
-                if transform:  # to transform the pointcloud at capture (zerowaste)
+                if transform:  # to transform the pointcloud at capture (zerowaste not calibration)
                     _transform_single_pointcloud(rob_num, frame, i, folders, filenames)
+                    frame_save_name = filenames[2].format(i) + "_trns.ply"
+                else:
+                    frame_save_name = filenames[2].format(i) + ".zdf"
 
-                frame.save(_create_file_path(folders[1].format(rob_num), filenames[5].format(i)))
+                frame.save(_create_file_path(folders[1].format(rob_num), frame_save_name))
 
             _ = convert2png(
                 pointcloud=pc,
