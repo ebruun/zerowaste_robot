@@ -58,20 +58,20 @@ def stitch_zerowaste(rob_nums, stitch=False, stitch_full=False, pose_range=False
         # HD
         pcd_vars = {
             "voxels": 0.001,
-            "neighbors": 30,
+            "neighbors": 20,
             "std_dev": 1.0,
             "radius": 0.08,
             "radius_pnts": 30,
         }
 
         # LD
-        pcd_vars = {
-            "voxels": 0.010,
-            "neighbors": 20,
-            "std_dev": 1.0,
-            "radius": 0.08,
-            "radius_pnts": 30,
-        }
+        # pcd_vars = {
+        #     "voxels": 0.010,
+        #     "neighbors": 20,
+        #     "std_dev": 1.0,
+        #     "radius": 0.08,
+        #     "radius_pnts": 30,
+        # }
 
         pcd_stitch_individual_rob(rob_nums, pose_range, folders, filenames, pcd_vars, vis_on)
 
@@ -79,20 +79,20 @@ def stitch_zerowaste(rob_nums, stitch=False, stitch_full=False, pose_range=False
         # HD
         pcd_vars = {
             "voxels": 0.001,
-            "neighbors": 30,
-            "std_dev": 2.0,
+            "neighbors": 20,
+            "std_dev": 1.0,
             "radius": 0.08,
             "radius_pnts": 30,
         }
 
         # LD
-        pcd_vars = {
-            "voxels": 0.010,
-            "neighbors": 30,
-            "std_dev": 2.0,
-            "radius": 0.08,
-            "radius_pnts": 30,
-        }
+        # pcd_vars = {
+        #     "voxels": 0.010,
+        #     "neighbors": 30,
+        #     "std_dev": 2.0,
+        #     "radius": 0.08,
+        #     "radius_pnts": 30,
+        # }
 
         pcd_stitch_combine_rob(folders, filenames, pcd_vars, vis_on)
 
@@ -121,13 +121,14 @@ if __name__ == "__main__":
     # set "save_config_n" to FALSE to execute aquisition
 
     # careful 15 --> 16, and next shift to wall also
-    # aquisition_zerowaste(rob_nums, save_config_n=False, pose_range=range(62, 63), transform=True)
+    # careful 59 --> 60 for robot 1
+    aquisition_zerowaste(rob_nums, save_config_n=False, pose_range=range(63, 106), transform=True)
 
     # stitch_zerowaste(
     #     rob_nums,
-    #     stitch=False,
+    #     stitch=True,
     #     stitch_full=True,
     #     vis_on=True,
     # )
 
-    select_pnts_zerowaste("WS3")
+    # select_pnts_zerowaste("WS3")

@@ -175,9 +175,9 @@ def pcd_stitch_individual_rob(rob_nums, pc_range, folders, filenames, pcd_vars, 
 
         # reduce when all together
         pcd_combined = pcd_combined.voxel_down_sample(voxel_size=pcd_vars["voxels"])
-        pcd_combined, _ = pcd_combined.remove_statistical_outlier(
-            nb_neighbors=pcd_vars["neighbors"], std_ratio=pcd_vars["std_dev"]
-        )
+        # pcd_combined, _ = pcd_combined.remove_statistical_outlier(
+        #     nb_neighbors=pcd_vars["neighbors"], std_ratio=pcd_vars["std_dev"]
+        # )
         # pcd_combined, _ = pcd_combined.remove_radius_outlier(
         #     nb_points=pcd_vars["radius_pnts"], radius=pcd_vars["radius"]
         # )
