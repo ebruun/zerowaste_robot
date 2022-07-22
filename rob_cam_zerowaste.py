@@ -122,7 +122,7 @@ if __name__ == "__main__":
 
     # careful 15 --> 16, and next shift to wall also
     # careful 59 --> 60 for robot 1
-    aquisition_zerowaste(rob_nums, save_config_n=False, pose_range=range(63, 106), transform=True)
+    # aquisition_zerowaste(rob_nums, save_config_n=False, pose_range=range(63, 106), transform=True)
 
     # stitch_zerowaste(
     #     rob_nums,
@@ -131,4 +131,4 @@ if __name__ == "__main__":
     #     vis_on=True,
     # )
 
-    # select_pnts_zerowaste("WS3")
+    select_pnts_zerowaste("NS4")
