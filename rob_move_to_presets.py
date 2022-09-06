@@ -12,6 +12,7 @@ preset_name = [
     "ECL_park_low",
     "ECL_demo",
     "wobj_x2",
+    "dropoff",
 ]
 
 abbs, _ = connect_to_robots(rob_nums)
