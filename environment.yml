@@ -1,0 +1,12 @@
+name: ziv261_cfab250
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - compas_fab==0.25.0
+  - compas_rrc==1.1.0
+  - flake8==3.9.2
+  - python==3.8.10
+  - zivid==2.5.0.2.6.1
+  - pre-commit==2.17.0
+prefix: C:\Users\Edvard\.conda\envs\ziv261_cfab250
