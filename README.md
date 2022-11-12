@@ -4,7 +4,7 @@ the project was completed with compas_fab 0.25.0, from the ziv261_cfab250 enviro
 
 On September 8th, 2022 (after completion of project) the visualizer component was updated: compas_fab 0.27.0 was installed from pre-compiled (unreleased) version, linked to rhino
 
-Make sure to unlink and relink old version if needed in future...
+Make sure to unlink and relink old version if needed in future...or just upgrade to official release now
 
 Excerpt from slack convo:
 
@@ -18,3 +18,5 @@ This was to fix an issue with ACM not showing up for robot2, wasn't fixed, but t
 Issue was made on github about this:
 
 https://github.com/compas-dev/compas_fab/issues/372#issue-1366740799
+
+11/12/2022: Upgrade to Zivid SDK V2.8.1, the zivid2 no longer works through USB. Works fine through ethernet, but then have to change the network settings from the robot control setup. Using ziv281_cfab250 environment now
