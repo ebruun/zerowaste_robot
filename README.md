@@ -20,3 +20,5 @@ Issue was made on github about this:
 https://github.com/compas-dev/compas_fab/issues/372#issue-1366740799
 
 11/12/2022: Upgrade to Zivid SDK V2.8.1, the zivid2 no longer works through USB. Works fine through ethernet, but then have to change the network settings from the robot control setup. Using ziv281_cfab250 environment now
+
+test
