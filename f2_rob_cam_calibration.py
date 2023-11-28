@@ -34,8 +34,16 @@ def aquisition_calibration(rob_nums, save_config_n=False, pose_range=False):
 
 
 def perform_calibration(rob_nums, pose_range):
-    folders = ["data/calibration/R{}", "transformations"]
-    filenames = ["pos{:02d}.yaml", "img{:02d}.zdf", "R{}_H2_tool0_cam.yaml"]
+    folders = [
+        "data/calibration/R{}",
+        "transformations"
+    ]
+
+    filenames = [
+        "pos{:02d}.yaml",
+        "img{:02d}.zdf",
+        "R{}_H2_tool0_cam.yaml"
+        ]
 
     for rob_num in rob_nums:
 
