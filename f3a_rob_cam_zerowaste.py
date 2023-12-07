@@ -37,8 +37,8 @@ def stitch_zerowaste(rob_nums, stitch=False, stitch_full=False, pose_range=False
     folders = [
         "transformations",
         "configs/stitch_shed/R{}",
-        "data/stitch_shed/R{}",
-        "data/stitch_shed",
+        "data/stitch_shed_original/R{}", #CHANGE THIS IF "NEW"
+        "data/stitch_shed_original", #CHANGE THIS IF "NEW"
     ]
     filenames = [
         "img{:02d}.zdf",
